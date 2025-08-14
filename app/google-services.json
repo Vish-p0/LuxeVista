@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "435686676725",
+    "project_id": "luxe-vista1",
+    "storage_bucket": "luxe-vista1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435686676725:android:60e10c236e06bcea1acdbc",
+        "android_client_info": {
+          "package_name": "com.example.luxevista"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANUVX5M545dBpYaf_GmehRZN507ap91mA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

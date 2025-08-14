@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.luxevista.HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/roomsFragment"
+        android:name="com.example.luxevista.RoomsFragment"
+        android:label="Rooms" />
+
+    <fragment
+        android:id="@+id/servicesFragment"
+        android:name="com.example.luxevista.ServicesFragment"
+        android:label="Services" />
+
+    <fragment
+        android:id="@+id/bookingsFragment"
+        android:name="com.example.luxevista.BookingsFragment"
+        android:label="Bookings" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.luxevista.ProfileFragment"
+        android:label="Profile" />
+
+</navigation>
+
+

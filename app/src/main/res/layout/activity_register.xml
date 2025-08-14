@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <tools:LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:id="@+id/main"
+        android:padding="24dp"
+        tools:context=".RegisterActivity">
+
+<EditText
+    android:id="@+id/editTextEmail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Email"
+    android:inputType="textEmailAddress"
+    android:autofillHints="emailAddress"/>
+
+<EditText
+    android:id="@+id/editTextPassword"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Password"
+    android:inputType="textPassword"
+    android:layout_marginTop="16dp"/>
+
+<EditText
+    android:id="@+id/editTextConfirmPassword"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Confirm Password"
+    android:inputType="textPassword"
+    android:layout_marginTop="16dp"/>
+
+<View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:layout_marginTop="24dp"
+    android:background="#E0E0E0"/>
+
+<EditText
+    android:id="@+id/editTextName"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:hint="Full Name"
+    android:inputType="textPersonName"/>
+
+<EditText
+    android:id="@+id/editTextPhone"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:hint="Phone"
+    android:inputType="phone"/>
+
+<EditText
+    android:id="@+id/editTextBirthday"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:hint="Birthday (dd MMM yyyy)"
+    android:focusable="false"
+    android:clickable="true"/>
+
+<EditText
+    android:id="@+id/editTextRoomType"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:hint="Preferred Room Type"
+    android:inputType="text"/>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="No Smoking"
+        android:textColor="#1B5E20"
+        android:textSize="16sp"/>
+
+    <Switch
+        android:id="@+id/switchNoSmokingRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+
+<Button
+    android:id="@+id/buttonRegister"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Register"
+    android:layout_marginTop="24dp"/>
+</tools:LinearLayout>
