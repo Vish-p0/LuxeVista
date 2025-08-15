@@ -33,7 +33,6 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         app:itemBackground="@drawable/selector_nav_item_background"
-        app:itemIconTint="@color/selector_bottom_nav_icon"
         app:itemIconSize="28dp"
         app:itemActiveIndicatorStyle="@null"
         app:labelVisibilityMode="unlabeled"

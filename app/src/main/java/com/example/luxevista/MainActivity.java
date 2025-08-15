@@ -27,31 +27,15 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-        // Optional: switch selected icon drawable when checked
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.homeFragment) {
-                item.setIcon(R.drawable.ic_home_selected);
-            } else if (itemId == R.id.roomsFragment) {
-                item.setIcon(R.drawable.ic_rooms_selected);
-            } else if (itemId == R.id.servicesFragment) {
-                item.setIcon(R.drawable.ic_service_selected);
-            } else if (itemId == R.id.bookingsFragment) {
-                item.setIcon(R.drawable.ic_bookings_selected);
-            } else if (itemId == R.id.profileFragment) {
-                item.setIcon(R.drawable.ic_profile_selected);
-            }
-            return NavigationUI.onNavDestinationSelected(item, navController);
-        });
-
         bottomNavigationView.setOnItemReselectedListener(item -> {
             // no-op: avoid fragment reloads on reselect
         });
 
-        // Ensure unselected icons reset appropriately when destination changes
+        // Handle icon switching for selected/unselected states
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             BottomNavigationView bnv = findViewById(R.id.bottom_navigation);
             if (bnv == null) return;
+            
             // Reset all to default icons (unselected)
             bnv.getMenu().findItem(R.id.homeFragment).setIcon(R.drawable.ic_home);
             bnv.getMenu().findItem(R.id.roomsFragment).setIcon(R.drawable.ic_rooms);
@@ -59,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             bnv.getMenu().findItem(R.id.bookingsFragment).setIcon(R.drawable.ic_bookings);
             bnv.getMenu().findItem(R.id.profileFragment).setIcon(R.drawable.ic_profile);
 
-            // Set selected icon
+            // Set selected icon based on current destination
             int destId = destination.getId();
             if (destId == R.id.homeFragment) {
                 bnv.getMenu().findItem(R.id.homeFragment).setIcon(R.drawable.ic_home_selected);

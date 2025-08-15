@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/ivAmenityIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/amenities_wifi"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_amenity_icon"
+        android:padding="4dp"
+        app:tint="#007AFF"
+        tools:src="@drawable/amenities_wifi" />
+
+    <TextView
+        android:id="@+id/tvAmenityName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="WiFi"
+        android:textColor="#1A1A1A"
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins_regular"
+        tools:text="WiFi" />
+
+</LinearLayout>

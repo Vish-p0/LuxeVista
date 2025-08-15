@@ -37,6 +37,8 @@
         <activity android:name=".SecuritySetupActivity" android:exported="false" />
         <activity android:name=".HelpActivity" android:exported="false" />
         <activity android:name=".SettingsPlaceholderActivity" android:exported="false" />
+        <activity android:name=".RoomDetailsActivity" android:exported="false" />
+        <activity android:name=".ServiceDetailsActivity" android:exported="false" />
     </application>
 
 </manifest>

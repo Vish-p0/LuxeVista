@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:strokeWidth="0dp"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Promotion Image -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp">
+
+            <ImageView
+                android:id="@+id/ivPromotionImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_image_placeholder"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+            <!-- Gradient Overlay -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_overlay_dark" />
+
+            <!-- Limited Time Badge -->
+            <TextView
+                android:id="@+id/tvPromotionBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:text="Limited Time"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:fontFamily="@font/poppins_bold"
+                android:background="@drawable/bg_promotion_tag"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:textAllCaps="true" />
+
+        </FrameLayout>
+
+        <!-- Promotion Details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvPromotionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Summer Special"
+                android:textColor="#1A1A1A"
+                android:textSize="18sp"
+                android:fontFamily="@font/poppins_bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Summer Special Offer" />
+
+            <TextView
+                android:id="@+id/tvPromotionDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="20% off Ocean View Suites"
+                android:textColor="#666666"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_marginTop="6dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:lineSpacingExtra="2dp"
+                tools:text="20% off Ocean View Suites for your perfect getaway" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

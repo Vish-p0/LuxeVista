@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    android:backgroundTint="#FFFFFF"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Service Image -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp">
+
+            <ImageView
+                android:id="@+id/ivServiceImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_image_placeholder"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+            <!-- Category Badge -->
+            <TextView
+                android:id="@+id/tvServiceCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="12dp"
+                android:text="Spa"
+                android:textColor="#1A1A1A"
+                android:textSize="12sp"
+                android:fontFamily="@font/poppins_bold"
+                android:background="@drawable/bg_service_category_badge"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                tools:text="Spa" />
+
+            <!-- Price Badge -->
+            <TextView
+                android:id="@+id/tvServicePrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:text="$85"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins_bold"
+                android:background="@drawable/bg_price_badge"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                tools:text="$85" />
+
+        </FrameLayout>
+
+        <!-- Service Details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Service Name and Duration -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvServiceName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Luxury Spa 60min"
+                    android:textColor="#1A1A1A"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    tools:text="Luxury Spa 60min Treatment" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_duration_tag"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_clock"
+                        android:layout_marginEnd="4dp"
+                        app:tint="#007AFF" />
+
+                    <TextView
+                        android:id="@+id/tvServiceDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="60min"
+                        android:textColor="#007AFF"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/poppins_medium"
+                        tools:text="60min" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Service Description -->
+            <TextView
+                android:id="@+id/tvServiceDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Relaxing full-body massage using essential oils and aromatherapy."
+                android:textColor="#666666"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:lineSpacingExtra="2dp"
+                tools:text="Relaxing full-body massage using essential oils and aromatherapy for the ultimate wellness experience." />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
