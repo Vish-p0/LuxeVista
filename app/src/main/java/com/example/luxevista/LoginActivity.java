@@ -16,7 +16,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword;
     private Button buttonLogin;
-    private TextView textViewRegister;
+    private TextView textViewRegister, textViewForgotPassword;
 
     private FirebaseAuth mAuth;
 
@@ -31,12 +31,19 @@ public class LoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         textViewRegister = findViewById(R.id.textViewRegister);
+        textViewForgotPassword = findViewById(R.id.textViewForgotPassword);
 
         buttonLogin.setOnClickListener(v -> loginUser());
 
         textViewRegister.setOnClickListener(v -> {
             // Open RegisterActivity when user clicks "Register"
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        });
+
+        textViewForgotPassword.setOnClickListener(v -> {
+            // Handle forgot password
+            handleForgotPassword();
         });
     }
 
@@ -57,9 +64,28 @@ public class LoginActivity extends AppCompatActivity {
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    // TODO: Navigate to your Home/Main Activity
+                    // Navigate to MainActivity
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+
+    private void handleForgotPassword() {
+        String email = editTextEmail.getText().toString().trim();
+        
+        if (TextUtils.isEmpty(email)) {
+            editTextEmail.setError("Please enter your email first");
+            return;
+        }
+
+        mAuth.sendPasswordResetEmail(email)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Password reset email sent", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }

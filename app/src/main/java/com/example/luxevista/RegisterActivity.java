@@ -6,9 +6,11 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,8 +21,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword, editTextConfirmPassword;
     private EditText editTextName, editTextPhone, editTextBirthday, editTextRoomType;
-    private Switch switchNoSmoking;
+    private SwitchMaterial switchNoSmoking;
     private Button buttonRegister;
+    private TextView textViewLogin;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
@@ -42,8 +45,16 @@ public class RegisterActivity extends AppCompatActivity {
         editTextRoomType = findViewById(R.id.editTextRoomType);
         switchNoSmoking = findViewById(R.id.switchNoSmokingRegister);
         buttonRegister = findViewById(R.id.buttonRegister);
+        textViewLogin = findViewById(R.id.textViewLogin);
 
         buttonRegister.setOnClickListener(v -> registerUser());
+        
+        textViewLogin.setOnClickListener(v -> {
+            // Navigate back to login
+            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+            finish();
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        });
 
         setupBirthdayPicker();
     }
@@ -83,8 +94,9 @@ public class RegisterActivity extends AppCompatActivity {
                         saveUserDocument(user.getUid(), name, email, phone, birthdayStr, roomType, noSmoking);
                     } else {
                         Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                         finish();
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     }
                 } else {
                     Toast.makeText(RegisterActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -131,14 +143,16 @@ public class RegisterActivity extends AppCompatActivity {
 
         firestore.collection("users").document(uid).set(data)
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                    Toast.makeText(RegisterActivity.this, "Registration successful! Welcome to LuxeVista", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                     finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(RegisterActivity.this, "User created but failed to save profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                     finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 });
     }
 }

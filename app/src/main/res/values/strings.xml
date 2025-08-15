@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">LuxeVista</string>
+    
+    <!-- Bookings Fragment -->
+    <string name="bookings_title">My Bookings</string>
+    <string name="search_bookings">Search bookings...</string>
+    <string name="filter_all">All</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_completed">Completed</string>
+    <string name="filter_cancelled">Cancelled</string>
+    
+    <!-- Booking Card -->
+    <string name="booking_type_room">Room</string>
+    <string name="booking_type_service">Service</string>
+    <string name="booking_id_label">Booking ID:</string>
+    <string name="booking_dates">%1$s - %2$s</string>
+    <string name="booking_price">%1$s %2$.2f</string>
+    <string name="status_confirmed">Confirmed</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_pending">Pending</string>
+    
+    <!-- Loading and Error States -->
+    <string name="loading_bookings">Loading bookings...</string>
+    <string name="no_bookings_found">No bookings found</string>
+    <string name="error_loading_bookings">Error loading bookings. Please try again.</string>
+    <string name="no_bookings_for_filter">No bookings found for this filter</string>
+    
+    <!-- Date Formats -->
+    <string name="date_format_short">MMM dd, yyyy</string>
+    <string name="time_format">HH:mm</string>
+    <string name="datetime_format">MMM dd, yyyy HH:mm</string>
 </resources>

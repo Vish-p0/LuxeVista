@@ -26,6 +26,7 @@ import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
+    private ImageView ivProfile;
     private TextView tvUserName;
     private TextView tvUserEmail;
     private TextView tvUserPhone;
@@ -53,6 +54,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        ivProfile = root.findViewById(R.id.ivProfile);
         tvUserName = root.findViewById(R.id.tvUserName);
         tvUserEmail = root.findViewById(R.id.tvUserEmail);
         tvUserPhone = root.findViewById(R.id.tvUserPhone);
@@ -66,6 +68,9 @@ public class ProfileFragment extends Fragment {
 
         setupClicks();
         loadUser();
+        
+        // Load profile image with fallback
+        ImageUtils.loadProfileImageWithFallback(ivProfile, null);
 
         return root;
     }
