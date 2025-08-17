@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -32,6 +35,11 @@
             android:name=".MainActivity"
             android:exported="true">
 
+        </activity>
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LuxeVista">
         </activity>
         <activity android:name=".EditProfileActivity" android:exported="false" />
         <activity android:name=".SecuritySetupActivity" android:exported="false" />

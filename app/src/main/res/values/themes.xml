@@ -7,6 +7,11 @@
 
     <style name="Theme.LuxeVista" parent="Base.Theme.LuxeVista" />
     
+    <!-- Optional overlay to control font family for bottom nav labels -->
+    <style name="ThemeOverlay.LuxeVista.BottomNav">
+        <item name="android:fontFamily">@font/poppins_regular</item>
+    </style>
+    
     <!-- Splash Screen Theme -->
     <style name="Theme.LuxeVista.Splash" parent="Theme.LuxeVista">
         <item name="android:windowFullscreen">true</item>
@@ -32,4 +37,6 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="rippleColor">@color/primary_light</item>
     </style>
+
+    
 </resources>

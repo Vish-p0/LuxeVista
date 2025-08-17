@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Placeholder overlay to satisfy any references; not actively applied -->
+    <style name="ThemeOverlay.LuxeVista" parent="ThemeOverlay.Material3" />
+    <style name="TextAppearance.BottomNav.Active" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.BottomNav.Inactive" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+</resources>
+

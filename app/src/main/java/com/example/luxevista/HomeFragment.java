@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import android.content.Intent;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -378,10 +379,21 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onRoomClick(Room room) {
         Log.d(TAG, "Room clicked: " + room.getName());
-        // Navigate to rooms fragment
-        if (getView() != null) {
-            Navigation.findNavController(getView()).navigate(R.id.roomsFragment);
+        // Open details directly so back returns to Home
+        if (getContext() == null) return;
+        Intent intent = new Intent(getContext(), RoomDetailsActivity.class);
+        intent.putExtra("roomId", room.getRoomId());
+        intent.putExtra("roomName", room.getName());
+        intent.putExtra("roomType", room.getType());
+        intent.putExtra("pricePerNight", room.getPricePerNight());
+        intent.putExtra("currency", room.getCurrency());
+        intent.putExtra("description", room.getDescription());
+        intent.putExtra("maxGuests", room.getMaxGuests());
+        if (room.getImageUrls() != null) {
+            String[] imageUrls = room.getImageUrls().toArray(new String[0]);
+            intent.putExtra("imageUrls", imageUrls);
         }
+        startActivity(intent);
     }
 
     @Override

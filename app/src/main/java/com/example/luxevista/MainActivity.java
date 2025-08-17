@@ -1,12 +1,14 @@
 package com.example.luxevista;
 
 import android.os.Bundle;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import androidx.navigation.ui.AppBarConfiguration;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -24,38 +26,28 @@ public class MainActivity extends AppCompatActivity {
         }
         NavController navController = navHostFragment.getNavController();
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            NavigationUI.setupWithNavController(bottomNav, navController);
 
-        bottomNavigationView.setOnItemReselectedListener(item -> {
-            // no-op: avoid fragment reloads on reselect
-        });
+            // Avoid reloading the current fragment on reselect
+            bottomNav.setOnItemReselectedListener(item -> { /* no-op */ });
 
-        // Handle icon switching for selected/unselected states
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            BottomNavigationView bnv = findViewById(R.id.bottom_navigation);
-            if (bnv == null) return;
-            
-            // Reset all to default icons (unselected)
-            bnv.getMenu().findItem(R.id.homeFragment).setIcon(R.drawable.ic_home);
-            bnv.getMenu().findItem(R.id.roomsFragment).setIcon(R.drawable.ic_rooms);
-            bnv.getMenu().findItem(R.id.servicesFragment).setIcon(R.drawable.ic_services);
-            bnv.getMenu().findItem(R.id.bookingsFragment).setIcon(R.drawable.ic_bookings);
-            bnv.getMenu().findItem(R.id.profileFragment).setIcon(R.drawable.ic_profile);
+            // Ensure no active indicator or background shape is shown
+            try {
+                bottomNav.setItemActiveIndicatorEnabled(false);
+            } catch (Throwable ignored) { }
+            bottomNav.setItemRippleColor(null);
+            bottomNav.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
+        }
 
-            // Set selected icon based on current destination
-            int destId = destination.getId();
-            if (destId == R.id.homeFragment) {
-                bnv.getMenu().findItem(R.id.homeFragment).setIcon(R.drawable.ic_home_selected);
-            } else if (destId == R.id.roomsFragment) {
-                bnv.getMenu().findItem(R.id.roomsFragment).setIcon(R.drawable.ic_rooms_selected);
-            } else if (destId == R.id.servicesFragment) {
-                bnv.getMenu().findItem(R.id.servicesFragment).setIcon(R.drawable.ic_service_selected);
-            } else if (destId == R.id.bookingsFragment) {
-                bnv.getMenu().findItem(R.id.bookingsFragment).setIcon(R.drawable.ic_bookings_selected);
-            } else if (destId == R.id.profileFragment) {
-                bnv.getMenu().findItem(R.id.profileFragment).setIcon(R.drawable.ic_profile_selected);
-            }
-        });
+        // Optional: Configure top-level destinations to avoid showing Up button
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.homeFragment,
+                R.id.roomsFragment,
+                R.id.servicesFragment,
+                R.id.bookingsFragment,
+                R.id.profileFragment
+        ).build();
     }
 }

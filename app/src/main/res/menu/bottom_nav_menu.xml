@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/selector_home_icon"
         android:title="Home" />
-
     <item
         android:id="@+id/roomsFragment"
-        android:icon="@drawable/ic_rooms"
+        android:icon="@drawable/selector_rooms_icon"
         android:title="Rooms" />
-
     <item
         android:id="@+id/servicesFragment"
-        android:icon="@drawable/ic_services"
+        android:icon="@drawable/selector_services_icon"
         android:title="Services" />
-
     <item
         android:id="@+id/bookingsFragment"
-        android:icon="@drawable/ic_bookings"
+        android:icon="@drawable/selector_bookings_icon"
         android:title="Bookings" />
-
     <item
         android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_profile"
+        android:icon="@drawable/selector_profile_icon"
         android:title="Profile" />
 </menu>
 

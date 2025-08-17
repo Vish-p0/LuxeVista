@@ -1,84 +1,113 @@
 package com.example.luxevista;
 
+import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+
 /**
- * Utility class for handling image loading with fallback support
- * across all fragments in the app
+ * Utility class for handling image loading with Glide and sensible fallbacks.
  */
 public class ImageUtils {
-    
-    /**
-     * Loads an image with fallback to placeholder
-     * 
-     * In a production app, you would use Glide or Picasso:
-     * 
-     * Glide.with(context)
-     *     .load(imageUrl)
-     *     .placeholder(R.drawable.ic_image_placeholder)
-     *     .error(R.drawable.ic_image_not_found)
-     *     .into(imageView);
-     * 
-     * @param imageView The ImageView to load the image into
-     * @param imageUrl The URL of the image to load (can be null or empty)
-     */
+
+    private static final String TAG = "ImageUtils";
+
+    private static final RequestOptions DEFAULT = new RequestOptions()
+            .placeholder(R.drawable.ic_image_placeholder)
+            .error(R.drawable.ic_image_not_found)
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .centerCrop();
+
     public static void loadImageWithFallback(ImageView imageView, String imageUrl) {
-        if (imageUrl == null || imageUrl.isEmpty()) {
-            // No URL provided, use placeholder
+        if (imageView == null) return;
+        if (TextUtils.isEmpty(imageUrl)) {
             imageView.setImageResource(R.drawable.ic_image_placeholder);
-        } else {
-            // In a real app, you would use an image loading library here
-            // For now, we'll use the placeholder as well since we don't have actual URLs
-            // TODO: Implement actual image loading with Glide/Picasso
-            imageView.setImageResource(R.drawable.ic_image_placeholder);
+            return;
         }
+        String url = normalizeImgurUrl(imageUrl);
+        Glide.with(imageView.getContext())
+                .load(url)
+                .apply(DEFAULT)
+                .listener(new LogListener())
+                .into(imageView);
     }
-    
-    /**
-     * Loads a profile image with fallback to profile placeholder
-     * 
-     * @param imageView The ImageView to load the image into
-     * @param imageUrl The URL of the profile image to load (can be null or empty)
-     */
+
     public static void loadProfileImageWithFallback(ImageView imageView, String imageUrl) {
-        if (imageUrl == null || imageUrl.isEmpty()) {
-            // No URL provided, use profile placeholder
+        if (imageView == null) return;
+        RequestOptions opts = new RequestOptions()
+                .placeholder(R.drawable.profile_placeholder)
+                .error(R.drawable.profile_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .circleCrop();
+
+        if (TextUtils.isEmpty(imageUrl)) {
             imageView.setImageResource(R.drawable.profile_placeholder);
-        } else {
-            // In a real app, you would use an image loading library here
-            // For now, we'll use the placeholder as well
-            // TODO: Implement actual image loading with Glide/Picasso
-            imageView.setImageResource(R.drawable.profile_placeholder);
+            return;
+        }
+        Glide.with(imageView.getContext())
+                .load(normalizeImgurUrl(imageUrl))
+                .apply(opts)
+                .listener(new LogListener())
+                .into(imageView);
+    }
+
+    public static void loadItemImageWithFallback(ImageView imageView, String imageUrl, String itemType) {
+        if (imageView == null) return;
+        int placeholder = R.drawable.ic_image_placeholder;
+        if ("room".equals(itemType)) placeholder = R.drawable.ic_rooms;
+        else if ("service".equals(itemType)) placeholder = R.drawable.ic_services;
+
+        RequestOptions opts = new RequestOptions()
+                .placeholder(placeholder)
+                .error(placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .centerCrop();
+
+        if (TextUtils.isEmpty(imageUrl)) {
+            imageView.setImageResource(placeholder);
+            return;
+        }
+        Glide.with(imageView.getContext())
+                .load(normalizeImgurUrl(imageUrl))
+                .apply(opts)
+                .listener(new LogListener())
+                .into(imageView);
+    }
+
+    private static class LogListener implements RequestListener<android.graphics.drawable.Drawable> {
+        @Override
+        public boolean onLoadFailed(GlideException e, Object model, Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
+            Log.e(TAG, "Glide load failed for: " + model, e);
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+            return false;
         }
     }
-    
-    /**
-     * Loads a room/service image with fallback for bookings
-     * 
-     * @param imageView The ImageView to load the image into
-     * @param imageUrl The URL of the image to load (can be null or empty)
-     * @param itemType The type of item ("room" or "service") for type-specific fallbacks
-     */
-    public static void loadItemImageWithFallback(ImageView imageView, String imageUrl, String itemType) {
-        if (imageUrl == null || imageUrl.isEmpty()) {
-            // No URL provided, use type-specific placeholder
-            if ("room".equals(itemType)) {
-                imageView.setImageResource(R.drawable.ic_rooms);
-            } else if ("service".equals(itemType)) {
-                imageView.setImageResource(R.drawable.ic_services);
-            } else {
-                imageView.setImageResource(R.drawable.ic_image_placeholder);
-            }
-        } else {
-            // In a real app, you would use an image loading library here
-            // For now, we'll use type-specific placeholders
-            if ("room".equals(itemType)) {
-                imageView.setImageResource(R.drawable.ic_rooms);
-            } else if ("service".equals(itemType)) {
-                imageView.setImageResource(R.drawable.ic_services);
-            } else {
-                imageView.setImageResource(R.drawable.ic_image_placeholder);
-            }
+
+    // Convert common Imgur page links to direct asset links (i.imgur.com/.. .jpg)
+    private static String normalizeImgurUrl(String url) {
+        if (TextUtils.isEmpty(url)) return url;
+        String lower = url.toLowerCase();
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp")) {
+            return url;
         }
+        try {
+            Uri uri = Uri.parse(url);
+            if ("imgur.com".equalsIgnoreCase(uri.getHost()) && uri.getPathSegments().size() >= 1) {
+                String id = uri.getLastPathSegment();
+                return "https://i.imgur.com/" + id + ".jpg";
+            }
+        } catch (Exception ignored) {}
+        return url;
     }
 }

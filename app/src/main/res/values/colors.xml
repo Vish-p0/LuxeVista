@@ -42,4 +42,7 @@
     
     <!-- Chip Colors -->
     <color name="chip_background">#E3F2FD</color>
+    
+    <!-- Bottom Navigation Active Indicator -->
+    <color name="nav_active_indicator">#42A5F5</color>
 </resources>
