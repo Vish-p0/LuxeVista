@@ -1,6 +1,171 @@
 <resources>
     <string name="app_name">LuxeVista</string>
     
+    <!-- Common UI -->
+    <string name="welcome_back">Welcome back,</string>
+    <string name="guest">Guest</string>
+    <string name="loading">Loading…</string>
+    <string name="save">Save</string>
+    <string name="back">Back</string>
+    <string name="continue_text">Continue</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="view_all">View All</string>
+    <string name="see_all">See All</string>
+    <string name="explore">Explore</string>
+    <string name="book_now">Book Now</string>
+    <string name="select_date">Select date</string>
+    <string name="not_set">Not set</string>
+    
+    <!-- Authentication -->
+    <string name="create_account">Create Account</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="birthday">Birthday</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    
+    <!-- Security -->
+    <string name="security_settings">Security Settings</string>
+    <string name="security">Security</string>
+    <string name="enable_security">Enable Security</string>
+    <string name="require_passcode_description">Require passcode when opening the app</string>
+    <string name="secure_account_description">Secure your account with a passcode</string>
+    <string name="passcode">Passcode</string>
+    <string name="four_digit_passcode">4-digit Passcode</string>
+    <string name="enter_passcode_continue">Enter your passcode to continue</string>
+    <string name="security_question">Security Question</string>
+    <string name="answer">Answer</string>
+    <string name="save_security_settings">Save Security Settings</string>
+    <string name="update_security_settings">Update Security Settings</string>
+    <string name="disable_security">Disable Security</string>
+    <string name="verify_passcode">Verify Passcode</string>
+    <string name="forgot_passcode">Forgot Passcode?</string>
+    <string name="passcode_recovery">Passcode Recovery</string>
+    <string name="answer_security_question_reset">Answer your security question to reset your passcode.</string>
+    <string name="security_question_label">Security Question:</string>
+    <string name="loading_question">Loading question...</string>
+    <string name="verify_answer">Verify Answer</string>
+    <string name="back_to_passcode">Back to Passcode</string>
+    <string name="security_disabled">Security disabled</string>
+    <string name="security_settings_saved">Security settings saved successfully</string>
+    <string name="select_security_question">Please select a security question</string>
+    <string name="enter_passcode_toast">Please enter your passcode</string>
+    <string name="enter_answer">Please enter your answer</string>
+    <string name="valid_passcode_required">Enter a valid 4-digit passcode</string>
+    <string name="valid_answer_required">Please enter a valid answer (at least 2 characters)</string>
+    
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="enable_passcode_lock">Enable Passcode Lock</string>
+    <string name="passcode_settings">Passcode Settings</string>
+    <string name="set_up_passcode_description">Set up a passcode to secure your app</string>
+    <string name="manage_passcode_description">Manage your passcode and security question</string>
+    <string name="app_information">App Information</string>
+    <string name="app_version">App Version</string>
+    <string name="app_version_number">LuxeVista v1.0.0</string>
+    
+    <!-- Profile -->
+    <string name="edit_profile">Edit Profile</string>
+    <string name="tap_change_photo">Tap to change photo</string>
+    <string name="no_smoking_preference">No Smoking Preference</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="preferred_room_type">Preferred Room Type</string>
+    <string name="profile_updated">Profile updated</string>
+    <string name="not_signed_in">Not signed in</string>
+    <string name="select_birthday">Select birthday</string>
+    
+    <!-- Home -->
+    <string name="loading_personalized_experience">Loading your personalized experience...</string>
+    <string name="enjoy_stay_luxevista">Enjoy your stay at LuxeVista</string>
+    <string name="special_promotions">Special Promotions</string>
+    <string name="nearby_attractions">Nearby Attractions</string>
+    <string name="featured_rooms">Featured Rooms</string>
+    <string name="featured_services">Featured Services</string>
+    
+    <!-- Promotions -->
+    <string name="promotions">Promotions</string>
+    <string name="limited_time">Limited Time</string>
+    <string name="summer_special">Summer Special</string>
+    <string name="ocean_view_discount">20% off Ocean View Suites</string>
+    <string name="view_more">View More</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="twenty_percent_off">20% OFF</string>
+    <string name="promo_code_summer">CODE: SUMMER20</string>
+    <string name="rooms">Rooms</string>
+    <string name="services">Services</string>
+    <string name="any_discount">Any discount</string>
+    <string name="ten_percent_or_more">>= 10%</string>
+    <string name="twenty_percent_or_more">>= 20%</string>
+    <string name="thirty_percent_or_more">>= 30%</string>
+    
+    <!-- Attractions -->
+    <string name="attractions">Attractions</string>
+    <string name="under_one_km">Under 1 km</string>
+    <string name="one_to_three_km">1 - 3 km</string>
+    <string name="three_to_five_km">3 - 5 km</string>
+    <string name="over_five_km">Over 5 km</string>
+    <string name="no_attractions_found">No attractions found</string>
+    <string name="sky_dining">Sky Dining</string>
+    <string name="distance_away">2.0 km away</string>
+    <string name="attraction_description">Description here</string>
+    <string name="attraction_name">Attraction name</string>
+    <string name="distance_km_away">1.2 km away</string>
+    <string name="coral_reef_snorkeling">Coral Reef Snorkeling</string>
+    <string name="explore_coral_reefs">Explore vibrant coral reefs and marine life</string>
+    <string name="distance_short">1.2 km</string>
+    
+    <!-- Rooms -->
+    <string name="room_type_deluxe">Deluxe</string>
+    <string name="room_type_standard">Standard</string>
+    <string name="price_per_night">$150</string>
+    <string name="price_hundred_night">$100/night</string>
+    <string name="ocean_view_suite">Ocean View Suite</string>
+    <string name="standard_twin_room">Standard Twin Room</string>
+    <string name="more_amenities">+3 more</string>
+    <string name="comfortable_twin_room_desc">Comfortable twin-bed room for budget-conscious travelers.</string>
+    <string name="amenities">Amenities</string>
+    <string name="book_this_room">Book This Room</string>
+    <string name="guest_count">2 guests</string>
+    <string name="guest_count_short">2</string>
+    <string name="price_hundred">$100</string>
+    <string name="per_night">per night</string>
+    <string name="check_in">Check-in</string>
+    <string name="check_out">Check-out</string>
+    <string name="total_price">Total Price:</string>
+    <string name="price_with_nights">$300 (3 nights)</string>
+    <string name="price_range_per_night">Price Range (per night)</string>
+    <string name="loading_available_rooms">Loading available rooms...</string>
+    <string name="no_rooms_found">No rooms found</string>
+    <string name="try_adjusting_filters">Try adjusting your search or filters</string>
+    <string name="amenity_plus_count">+3</string>
+    
+    <!-- Services -->
+    <string name="spa">Spa</string>
+    <string name="price_eighty_five">$85</string>
+    <string name="luxury_spa_treatment">Luxury Spa Treatment</string>
+    <string name="sixty_minutes">60 minutes</string>
+    <string name="luxury_spa_sixty_min">Luxury Spa 60min</string>
+    <string name="relaxing_massage_desc">Relaxing full-body massage using essential oils and aromatherapy.</string>
+    <string name="book_this_service">Book This Service</string>
+    <string name="service_label">Service:</string>
+    <string name="duration_label">Duration:</string>
+    <string name="select_appointment_datetime">Select appointment date and time</string>
+    <string name="select_datetime">Select date and time</string>
+    <string name="tap_choose_appointment">Tap to choose appointment time</string>
+    <string name="loading_available_services">Loading available services...</string>
+    <string name="no_services_found">No services found</string>
+    <string name="price_range">Price Range</string>
+    <string name="categories">Categories</string>
+    
     <!-- Bookings Fragment -->
     <string name="bookings_title">My Bookings</string>
     <string name="search_bookings">Search bookings...</string>
@@ -24,6 +189,26 @@
     <string name="no_bookings_found">No bookings found</string>
     <string name="error_loading_bookings">Error loading bookings. Please try again.</string>
     <string name="no_bookings_for_filter">No bookings found for this filter</string>
+    
+    <!-- Signup -->
+    <string name="account_information">Account Information</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="tell_us_about_yourself">Tell us a bit more about yourself</string>
+    <string name="lets_get_started">Let\'s get started with your account details</string>
+    <string name="join_exclusive_experiences">Join us for exclusive luxury experiences</string>
+    <string name="ocean_view_suite_option">Ocean View Suite</string>
+    <string name="deluxe_room_option">Deluxe Room</string>
+    <string name="standard_room_option">Standard Room</string>
+    
+    <!-- Splash -->
+    <string name="luxury_redefined">Luxury Redefined</string>
+    <string name="experience_unparalleled">Experience unparalleled comfort and elegance</string>
+    <string name="crafting_perfect_stay">Crafting your perfect stay...</string>
+    <string name="welcome_to_luxury">Welcome to luxury</string>
+    
+    <!-- Amenities -->
+    <string name="amenity_wifi">WiFi</string>
     
     <!-- Date Formats -->
     <string name="date_format_short">MMM dd, yyyy</string>

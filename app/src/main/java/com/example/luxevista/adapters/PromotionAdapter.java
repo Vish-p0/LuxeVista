@@ -51,9 +51,7 @@ public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.Prom
     }
 
     @Override
-    public int getItemCount() {
-        return promotions.size();
-    }
+    public int getItemCount() { return promotions.size(); }
 
     static class PromotionViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivPromotionImage;
@@ -93,4 +91,5 @@ public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.Prom
             });
         }
     }
+
 }

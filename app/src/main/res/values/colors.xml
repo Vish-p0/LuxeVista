@@ -3,7 +3,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <!-- Primary Colors -->
+    <!-- Primary App Colors -->
+    <color name="app_blue">#007AFF</color>
+    <color name="app_blue_dark">#0A84FF</color>
+    <color name="app_blue_light">#1976D2</color>
+    
+    <!-- Legacy Primary Colors -->
     <color name="primary">#4CAF50</color>
     <color name="primary_dark">#388E3C</color>
     <color name="primary_light">#C8E6C9</color>
@@ -11,12 +16,19 @@
     <!-- Background Colors -->
     <color name="background_primary">#F8F9FA</color>
     <color name="background_secondary">#FFFFFF</color>
+    <color name="background_tertiary">#E8F5E9</color>
     <color name="surface">#FFFFFF</color>
     
     <!-- Text Colors -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_tertiary">#333333</color>
+    <color name="text_quaternary">#999999</color>
     <color name="text_hint">#BDBDBD</color>
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_light_blue">#E3F2FD</color>
+    <color name="text_blue_tint">#90CAF9</color>
+    <color name="text_blue_accent">#BBDEFB</color>
     
     <!-- Card Colors -->
     <color name="card_background">#FFFFFF</color>

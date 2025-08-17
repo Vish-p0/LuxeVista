@@ -2,38 +2,39 @@ package com.example.luxevista;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class SecuritySetupActivity extends AppCompatActivity {
 
     private TextInputEditText etPasscode;
-    private AutoCompleteTextView spinnerQuestion;
+    private MaterialAutoCompleteTextView spinnerQuestion;
     private TextInputEditText etAnswer;
-    private Button btnSave;
+    private MaterialButton btnSave;
+    private ImageView btnBack;
+    private SwitchMaterial switchSecurity;
+    private TextInputLayout layoutPasscode, layoutQuestion, layoutAnswer;
 
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firestore;
+    private SecurityManager securityManager;
 
     private static final String[] QUESTIONS = new String[] {
+            "What was the name of your first pet?",
             "What is your mother's maiden name?",
-            "What was your first pet's name?",
-            "What city were you born in?",
-            "What is your favorite teacher's name?"
+            "What was the name of your first school?",
+            "What is your favorite childhood memory?",
+            "What was your childhood nickname?",
+            "What city were you born in?"
     };
 
     @Override
@@ -41,24 +42,87 @@ public class SecuritySetupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security_setup);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
+        securityManager = new SecurityManager(this);
 
+        initViews();
+        setupDropdown();
+        setupClickListeners();
+        loadExistingData();
+        updateSecurityFieldsVisibility();
+    }
+
+    private void initViews() {
         etPasscode = findViewById(R.id.etPasscode);
         spinnerQuestion = findViewById(R.id.spinnerQuestion);
         etAnswer = findViewById(R.id.etAnswer);
         btnSave = findViewById(R.id.btnSaveSecurity);
+        btnBack = findViewById(R.id.btnBack);
+        switchSecurity = findViewById(R.id.switchSecurity);
+        layoutPasscode = findViewById(R.id.layoutPasscode);
+        layoutQuestion = findViewById(R.id.layoutQuestion);
+        layoutAnswer = findViewById(R.id.layoutAnswer);
+    }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, QUESTIONS);
+    private void setupDropdown() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, 
+                android.R.layout.simple_dropdown_item_1line, QUESTIONS);
         spinnerQuestion.setAdapter(adapter);
+    }
 
+    private void setupClickListeners() {
+        btnBack.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveSecurity());
+        
+        switchSecurity.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            updateSecurityFieldsVisibility();
+            if (!isChecked) {
+                // Clear fields when security is disabled
+                etPasscode.setText("");
+                etAnswer.setText("");
+                spinnerQuestion.setText("", false);
+            }
+        });
+    }
+
+    private void updateSecurityFieldsVisibility() {
+        boolean isEnabled = switchSecurity.isChecked();
+        int visibility = isEnabled ? View.VISIBLE : View.GONE;
+        
+        layoutPasscode.setVisibility(visibility);
+        layoutQuestion.setVisibility(visibility);
+        layoutAnswer.setVisibility(visibility);
+        
+        // Update button text
+        if (isEnabled) {
+            btnSave.setText(securityManager.hasPasscode() ? getString(R.string.update_security_settings) : getString(R.string.save_security_settings));
+        } else {
+            btnSave.setText(getString(R.string.disable_security));
+        }
+    }
+
+    private void loadExistingData() {
+        // Load current security status
+        boolean isSecurityEnabled = securityManager.isSecurityEnabled();
+        switchSecurity.setChecked(isSecurityEnabled);
+        
+        // If passcode already exists, show existing data
+        if (securityManager.hasPasscode()) {
+            // Show existing security question if available
+            String existingQuestion = securityManager.getSecurityQuestion();
+            if (existingQuestion != null) {
+                spinnerQuestion.setText(existingQuestion, false);
+            }
+        }
     }
 
     private void saveSecurity() {
-        FirebaseUser current = firebaseAuth.getCurrentUser();
-        if (current == null) {
-            Toast.makeText(this, "Not signed in", Toast.LENGTH_SHORT).show();
+        boolean isSecurityEnabled = switchSecurity.isChecked();
+        
+        if (!isSecurityEnabled) {
+            // Disable security
+            securityManager.setSecurityEnabled(false);
+            Toast.makeText(this, getString(R.string.security_disabled), Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
@@ -66,27 +130,32 @@ public class SecuritySetupActivity extends AppCompatActivity {
         String question = spinnerQuestion.getText() != null ? spinnerQuestion.getText().toString().trim() : "";
         String answer = etAnswer.getText() != null ? etAnswer.getText().toString().trim() : "";
 
+        // Validation
         if (passcode.length() != 4 || !TextUtils.isDigitsOnly(passcode)) {
-            Toast.makeText(this, "Enter a valid 4-digit passcode", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.valid_passcode_required), Toast.LENGTH_SHORT).show();
+            etPasscode.requestFocus();
             return;
         }
-        if (TextUtils.isEmpty(question) || TextUtils.isEmpty(answer)) {
-            Toast.makeText(this, "Select a question and enter an answer", Toast.LENGTH_SHORT).show();
+        
+        if (TextUtils.isEmpty(question)) {
+            Toast.makeText(this, getString(R.string.select_security_question), Toast.LENGTH_SHORT).show();
+            spinnerQuestion.requestFocus();
+            return;
+        }
+        
+        if (TextUtils.isEmpty(answer) || answer.length() < 2) {
+            Toast.makeText(this, getString(R.string.valid_answer_required), Toast.LENGTH_SHORT).show();
+            etAnswer.requestFocus();
             return;
         }
 
-        Map<String, Object> security = new HashMap<>();
-        security.put("passcode", passcode);
-        security.put("securityQuestion", question);
-        security.put("securityAnswer", answer);
+        // Save to local storage
+        securityManager.setPasscode(passcode);
+        securityManager.setSecurityQuestion(question, answer);
+        securityManager.setSecurityEnabled(true);
 
-        DocumentReference ref = firestore.collection("users").document(current.getUid());
-        ref.update(security)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(this, "Security settings saved", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+        Toast.makeText(this, getString(R.string.security_settings_saved), Toast.LENGTH_SHORT).show();
+        finish();
     }
 }
 

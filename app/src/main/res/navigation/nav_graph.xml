@@ -29,6 +29,16 @@
         android:name="com.example.luxevista.ProfileFragment"
         android:label="Profile" />
 
+    <fragment
+        android:id="@+id/attractionsFragment"
+        android:name="com.example.luxevista.AttractionsFragment"
+        android:label="Attractions" />
+
+    <fragment
+        android:id="@+id/promotionsGridFragment"
+        android:name="com.example.luxevista.PromotionsGridFragment"
+        android:label="Promotions" />
+
 </navigation>
 
 

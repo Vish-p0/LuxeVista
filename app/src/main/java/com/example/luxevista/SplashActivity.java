@@ -120,8 +120,15 @@ public class SplashActivity extends AppCompatActivity {
         
         Intent intent;
         if (currentUser != null) {
-            // User is already logged in, go to main activity
-            intent = new Intent(SplashActivity.this, MainActivity.class);
+            // User is logged in, check if security is enabled
+            SecurityManager securityManager = new SecurityManager(this);
+            if (securityManager.isSecurityEnabled() && securityManager.hasPasscode()) {
+                // Security is enabled, go to passcode verification
+                intent = new Intent(SplashActivity.this, PasscodeVerificationActivity.class);
+            } else {
+                // No security or security disabled, go to main activity
+                intent = new Intent(SplashActivity.this, MainActivity.class);
+            }
         } else {
             // User is not logged in, go to login activity
             intent = new Intent(SplashActivity.this, LoginActivity.class);

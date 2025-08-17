@@ -87,8 +87,7 @@ public class ProfileFragment extends Fragment {
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
         btnSettings.setOnClickListener(v -> {
-            // Placeholder screen for now
-            Intent intent = new Intent(requireContext(), SettingsPlaceholderActivity.class);
+            Intent intent = new Intent(requireContext(), SettingsActivity.class);
             startActivity(intent);
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
@@ -134,7 +133,7 @@ public class ProfileFragment extends Fragment {
                 tvUserName.setText(currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "");
                 tvUserEmail.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
                 tvUserPhone.setText(currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber() : "");
-                tvUserBirthday.setText("");
+                tvUserBirthday.setText(getString(R.string.not_set));
             }
             return;
         }
@@ -147,7 +146,8 @@ public class ProfileFragment extends Fragment {
         tvUserName.setText(name != null ? name : "");
         tvUserEmail.setText(email != null ? email : "");
         tvUserPhone.setText(phone != null ? phone : "");
-        tvUserBirthday.setText(formatDate(birthDay != null ? birthDay.toDate() : null));
+        String birthdayText = formatDate(birthDay != null ? birthDay.toDate() : null);
+        tvUserBirthday.setText(!birthdayText.isEmpty() ? birthdayText : getString(R.string.not_set));
     }
 
     private String formatDate(Date date) {

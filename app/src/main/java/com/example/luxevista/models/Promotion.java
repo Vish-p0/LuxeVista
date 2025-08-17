@@ -8,28 +8,38 @@ import java.util.List;
 import java.util.Map;
 
 public class Promotion {
+    private String promotionId;
     private String title;
     private String description;
-    private String imageURL;  // Changed to match your database field name
+    private String imageUrl;  // Matches Firestore field name
     private Timestamp startAt;
     private Timestamp endAt;
     private Map<String, Object> target;
+    private String promoCode;
+    private int discountPercent;
 
     // Default constructor required for Firestore
     public Promotion() {}
 
     // Constructor
-    public Promotion(String title, String description, String imageURL, Timestamp startAt, 
-                    Timestamp endAt, Map<String, Object> target) {
+    public Promotion(String promotionId, String title, String description, String imageUrl, Timestamp startAt,
+                     Timestamp endAt, Map<String, Object> target, String promoCode, int discountPercent) {
+        this.promotionId = promotionId;
         this.title = title;
         this.description = description;
-        this.imageURL = imageURL;
+        this.imageUrl = imageUrl;
         this.startAt = startAt;
         this.endAt = endAt;
         this.target = target;
+        this.promoCode = promoCode;
+        this.discountPercent = discountPercent;
     }
 
     // Getters
+    public String getPromotionId() {
+        return promotionId;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -38,9 +48,8 @@ public class Promotion {
         return description;
     }
 
-    public String getImageURL() {  // Changed getter name
-        return imageURL;
-    }
+    public String getImageURL() { return imageUrl; }
+    public String getImageUrl() { return imageUrl; }
 
     public Timestamp getStartAt() {
         return startAt;
@@ -54,7 +63,12 @@ public class Promotion {
         return target;
     }
 
+    public String getPromoCode() { return promoCode; }
+    public int getDiscountPercent() { return discountPercent; }
+
     // Setters
+    public void setPromotionId(String promotionId) { this.promotionId = promotionId; }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -63,9 +77,8 @@ public class Promotion {
         this.description = description;
     }
 
-    public void setImageURL(String imageURL) {  // Changed setter name
-        this.imageURL = imageURL;
-    }
+    public void setImageURL(String imageURL) { this.imageUrl = imageURL; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public void setStartAt(Timestamp startAt) {
         this.startAt = startAt;
@@ -78,6 +91,9 @@ public class Promotion {
     public void setTarget(Map<String, Object> target) {
         this.target = target;
     }
+
+    public void setPromoCode(String promoCode) { this.promoCode = promoCode; }
+    public void setDiscountPercent(int discountPercent) { this.discountPercent = discountPercent; }
 
     // Helper methods
     @Exclude
@@ -114,9 +130,5 @@ public class Promotion {
         return null;
     }
 
-    // For compatibility with existing adapter
-    @Exclude
-    public String getImageUrl() {
-        return imageURL;
-    }
+    // keep compatibility helper if needed
 }

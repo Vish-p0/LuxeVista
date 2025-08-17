@@ -43,10 +43,14 @@
         </activity>
         <activity android:name=".EditProfileActivity" android:exported="false" />
         <activity android:name=".SecuritySetupActivity" android:exported="false" />
+        <activity android:name=".SecurityRecoveryActivity" android:exported="false" />
+        <activity android:name=".PasscodeVerificationActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
         <activity android:name=".HelpActivity" android:exported="false" />
         <activity android:name=".SettingsPlaceholderActivity" android:exported="false" />
         <activity android:name=".RoomDetailsActivity" android:exported="false" />
         <activity android:name=".ServiceDetailsActivity" android:exported="false" />
+        <activity android:name=".AttractionDetailsActivity" android:exported="false" />
     </application>
 
 </manifest>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_splash_background"
+    android:gravity="center"
+    android:padding="32dp">
+
+    <!-- App Logo/Icon -->
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_lock"
+        app:tint="#FFFFFF"
+        android:contentDescription="Lock Icon" />
+
+    <!-- App Name -->
+    <TextView
+        android:id="@+id/tvAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/app_name"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins_bold" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:text="@string/enter_passcode_continue"
+        android:textColor="#E3F2FD"
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins_regular" />
+
+    <!-- Passcode Input Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Passcode Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:hint="@string/passcode"
+                app:boxBackgroundMode="filled"
+                app:boxBackgroundColor="#F5F5F5"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:hintTextColor="#1976D2"
+                app:boxStrokeColor="#1976D2"
+                app:boxStrokeWidth="2dp"
+                app:startIconDrawable="@drawable/ic_lock"
+                app:startIconTint="#1976D2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPasscode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.5"
+                    android:gravity="center"
+                    android:fontFamily="@font/poppins_bold" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Verify Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerify"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/verify_passcode"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1976D2"
+                app:cornerRadius="12dp"
+                app:elevation="2dp"
+                android:fontFamily="@font/poppins_medium" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Forgot Passcode Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnForgotPasscode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_passcode"
+        android:textSize="14sp"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:background="@android:color/transparent"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="1dp"
+        app:cornerRadius="20dp"
+        android:fontFamily="@font/poppins_medium" />
+
+</LinearLayout>

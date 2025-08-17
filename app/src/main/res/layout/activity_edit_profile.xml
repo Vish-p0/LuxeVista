@@ -21,8 +21,7 @@
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_add"
-            android:rotation="180"
+            android:src="@drawable/ic_arrow_back"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"
             app:tint="#007AFF"
@@ -137,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:hint="Preferred Room Type"
+                android:hint="Birthday"
                 app:boxBackgroundMode="filled"
                 app:boxBackgroundColor="#FFFFFF"
                 app:boxCornerRadiusTopStart="12dp"
@@ -149,9 +148,38 @@
                 app:boxStrokeWidth="2dp">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBirthday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#1A1A1A"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:paddingVertical="16dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:hint="Preferred Room Type"
+                app:endIconMode="dropdown_menu"
+                app:boxBackgroundMode="filled"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:hintTextColor="#007AFF"
+                app:boxStrokeColor="#007AFF"
+                app:boxStrokeWidth="2dp">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/etRoomType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="none"
                     android:textColor="#1A1A1A"
                     android:textSize="16sp"
                     android:fontFamily="@font/poppins_regular"

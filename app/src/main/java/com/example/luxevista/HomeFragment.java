@@ -33,7 +33,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -133,14 +137,13 @@ public class HomeFragment extends Fragment implements
         tvSeeAllPromotions.setOnClickListener(v -> {
             // Navigate to promotions section (could be part of another fragment)
             Log.d(TAG, "See all promotions clicked");
-            // For now, navigate to rooms as promotions might be room-related
-            Navigation.findNavController(v).navigate(R.id.roomsFragment);
+            Navigation.findNavController(v).navigate(R.id.promotionsGridFragment);
         });
 
         tvSeeAllAttractions.setOnClickListener(v -> {
             // Navigate to attractions section
             Log.d(TAG, "See all attractions clicked");
-            // For now, no dedicated attractions page, could be future feature
+            Navigation.findNavController(v).navigate(R.id.attractionsFragment);
         });
 
         tvSeeAllRooms.setOnClickListener(v -> {
@@ -222,21 +225,46 @@ public class HomeFragment extends Fragment implements
                     Log.d(TAG, "Promotions query successful, documents found: " + queryDocumentSnapshots.size());
                     allPromotions.clear();
 
+                    Date now = new Date();
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
                         try {
                             Log.d(TAG, "Processing promotion document: " + document.getId());
-                            Log.d(TAG, "Document data: " + document.getData());
-                            
-                            Promotion promotion = document.toObject(Promotion.class);
-                            if (promotion != null) {
-                                Log.d(TAG, "Promotion parsed: " + promotion.getTitle() + ", active: " + promotion.isActive());
-                                if (promotion.isActive()) {
-                                    allPromotions.add(promotion);
-                                    Log.d(TAG, "Added active promotion: " + promotion.getTitle());
-                                }
-                            } else {
-                                Log.w(TAG, "Promotion object is null for document: " + document.getId());
+                            // Build Promotion manually to avoid type mismatches on startAt/endAt
+                            Promotion p = new Promotion();
+                            p.setPromotionId(document.getString("promotionId"));
+                            p.setTitle(document.getString("title"));
+                            p.setDescription(document.getString("description"));
+                            // handle both imageURL and imageUrl
+                            String imageUrl = document.getString("imageUrl");
+                            if (imageUrl == null) imageUrl = document.getString("imageURL");
+                            if (imageUrl != null) p.setImageUrl(imageUrl);
+                            p.setPromoCode(document.getString("promoCode"));
+                            Object discountRaw = document.get("discountPercent");
+                            if (discountRaw instanceof Number) {
+                                p.setDiscountPercent(((Number) discountRaw).intValue());
+                            } else if (discountRaw instanceof String) {
+                                try { p.setDiscountPercent(Integer.parseInt((String) discountRaw)); } catch (Exception ignored) {}
                             }
+                            Object targetRaw = document.get("target");
+                            if (targetRaw instanceof java.util.Map) {
+                                //noinspection unchecked
+                                p.setTarget((java.util.Map<String, Object>) targetRaw);
+                            }
+
+                            // Parse dates flexibly
+                            Object startRaw = document.get("startAt");
+                            Object endRaw = document.get("endAt");
+                            Date startDate = parseDateFlexible(startRaw);
+                            Date endDate = parseDateFlexible(endRaw);
+
+                            boolean isActive;
+                            if (startDate != null && endDate != null) {
+                                isActive = !now.before(startDate) && !now.after(endDate);
+                            } else {
+                                isActive = p.isActive();
+                            }
+
+                            if (isActive) { allPromotions.add(p); }
                         } catch (Exception e) {
                             Log.e(TAG, "Error parsing promotion document: " + document.getId(), e);
                         }
@@ -252,12 +280,34 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    private Date parseDateFlexible(Object raw) {
+        if (raw == null) return null;
+        if (raw instanceof com.google.firebase.Timestamp) {
+            return ((com.google.firebase.Timestamp) raw).toDate();
+        }
+        if (raw instanceof String) {
+            String s = (String) raw;
+            String[] patterns = new String[] {
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ssXXX",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            };
+            for (String pattern : patterns) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+                    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    return sdf.parse(s);
+                } catch (ParseException ignored) {}
+            }
+        }
+        return null;
+    }
+
     private void loadAttractions(Runnable onComplete) {
         Log.d(TAG, "Loading attractions from Firestore...");
         db.collection("attractions")
                 .whereEqualTo("visible", true)
-                .orderBy("distanceKM", Query.Direction.ASCENDING)
-                .limit(10)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     Log.d(TAG, "Attractions query successful, documents found: " + queryDocumentSnapshots.size());
@@ -265,29 +315,46 @@ public class HomeFragment extends Fragment implements
 
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
                         try {
-                            Log.d(TAG, "Processing attraction document: " + document.getId());
+                            String docId = document.getId();
+                            String attractionId = document.getString("attractionId");
+                            Log.d(TAG, "Processing attraction document: " + docId + ", attractionId field: " + attractionId);
                             Log.d(TAG, "Document data: " + document.getData());
-                            
+
                             Attraction attraction = document.toObject(Attraction.class);
                             if (attraction != null) {
-                                Log.d(TAG, "Attraction parsed: " + attraction.getName() + ", visible: " + attraction.isVisible());
+                                // Enhanced debug details
+                                String firstImage = (attraction.getImageUrls() != null && !attraction.getImageUrls().isEmpty()) ? attraction.getImageUrls().get(0) : null;
+                                Log.d(TAG, "Attraction parsed: name=" + attraction.getName()
+                                        + ", visible=" + attraction.isVisible()
+                                        + ", distanceKM=" + attraction.getDistanceKM()
+                                        + ", firstImageUrl=" + firstImage);
                                 if (attraction.isVisible()) {
                                     allAttractions.add(attraction);
-                                    Log.d(TAG, "Added attraction: " + attraction.getName());
                                 }
                             } else {
-                                Log.w(TAG, "Attraction object is null for document: " + document.getId());
+                                Log.w(TAG, "Attraction object is null for document: " + docId);
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "Error parsing attraction document: " + document.getId(), e);
                         }
                     }
 
+                    // Client-side sort by distanceKM ascending to avoid Firestore composite index requirement
+                    allAttractions.sort((a1, a2) -> Double.compare(a1.getDistanceKM(), a2.getDistanceKM()));
+                    // Limit to 10 after sorting if needed
+                    if (allAttractions.size() > 10) {
+                        allAttractions = new ArrayList<>(allAttractions.subList(0, 10));
+                    }
+
                     attractionAdapter.updateAttractions(allAttractions);
-                    Log.d(TAG, "Loaded " + allAttractions.size() + " attractions");
+                    Log.d(TAG, "Loaded " + allAttractions.size() + " attractions (sorted by distanceKM)");
                     onComplete.run();
                 })
                 .addOnFailureListener(e -> {
+                    String message = e.getMessage();
+                    if (message != null && message.contains("FAILED_PRECONDITION")) {
+                        Log.e(TAG, "Attractions query requires an index. Consider client-side sorting (implemented) or create a composite index.");
+                    }
                     Log.e(TAG, "Error loading attractions", e);
                     onComplete.run();
                 });
@@ -296,8 +363,6 @@ public class HomeFragment extends Fragment implements
     private void loadFeaturedRooms(Runnable onComplete) {
         db.collection("rooms")
                 .whereEqualTo("visible", true)
-                .orderBy("pricePerNight", Query.Direction.ASCENDING)
-                .limit(5)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     allRooms.clear();
@@ -313,8 +378,13 @@ public class HomeFragment extends Fragment implements
                         }
                     }
 
-                    featuredRoomAdapter.updateRooms(allRooms);
-                    Log.d(TAG, "Loaded " + allRooms.size() + " featured rooms");
+                    // Sort client-side by price
+                    allRooms.sort((r1, r2) -> Double.compare(r1.getPricePerNight(), r2.getPricePerNight()));
+                    // Limit to top 5
+                    List<Room> featured = allRooms.size() > 5 ? new ArrayList<>(allRooms.subList(0, 5)) : new ArrayList<>(allRooms);
+
+                    featuredRoomAdapter.updateRooms(featured);
+                    Log.d(TAG, "Loaded " + featured.size() + " featured rooms");
                     onComplete.run();
                 })
                 .addOnFailureListener(e -> {
@@ -372,8 +442,16 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onAttractionClick(Attraction attraction) {
         Log.d(TAG, "Attraction clicked: " + attraction.getName());
-        // Handle attraction click - could open details or booking
-        // For now, just log the click as there's no dedicated attractions page
+        if (getContext() == null) return;
+        Intent intent = new Intent(getContext(), AttractionDetailsActivity.class);
+        intent.putExtra("name", attraction.getName());
+        intent.putExtra("description", attraction.getDescription());
+        intent.putExtra("distanceKM", attraction.getDistanceKM());
+        if (attraction.getImageUrls() != null) {
+            String[] imageUrls = attraction.getImageUrls().toArray(new String[0]);
+            intent.putExtra("imageUrls", imageUrls);
+        }
+        startActivity(intent);
     }
 
     @Override
