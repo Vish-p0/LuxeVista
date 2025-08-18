@@ -37,6 +37,14 @@ public class SignupStep1Fragment extends Fragment {
         etPassword = view.findViewById(R.id.etPassword);
         etConfirmPassword = view.findViewById(R.id.etConfirmPassword);
         btnNext = view.findViewById(R.id.btnNext);
+        
+        TextView tvLoginLink = view.findViewById(R.id.tvLoginLink);
+        tvLoginLink.setOnClickListener(v -> {
+            // Navigate back to LoginActivity
+            requireActivity().finish();
+            // Add smooth transition
+            requireActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        });
 
         btnNext.setOnClickListener(v -> {
             if (validate()) {

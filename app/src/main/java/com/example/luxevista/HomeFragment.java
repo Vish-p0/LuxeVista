@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,17 +17,24 @@ import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import androidx.navigation.Navigation;
+import androidx.navigation.NavController;
+import androidx.recyclerview.widget.GridLayoutManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.luxevista.adapters.AttractionAdapter;
+import com.example.luxevista.adapters.CarouselAdapter;
 import com.example.luxevista.adapters.FeaturedRoomAdapter;
 import com.example.luxevista.adapters.FeaturedServiceAdapter;
 import com.example.luxevista.adapters.PromotionAdapter;
+import com.example.luxevista.adapters.TestimonialAdapter;
 import com.example.luxevista.models.Attraction;
 import com.example.luxevista.models.Promotion;
 import com.example.luxevista.models.Room;
 import com.example.luxevista.models.Service;
+import com.example.luxevista.models.Testimonial;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,6 +42,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,8 +63,11 @@ public class HomeFragment extends Fragment implements
     private FrameLayout loadingOverlay;
     private NestedScrollView mainContent;
     private TextView tvWelcomeUserName;
-    private TextView tvSeeAllPromotions, tvSeeAllAttractions, tvSeeAllRooms, tvSeeAllServices;
-    private RecyclerView recyclerPromotions, recyclerAttractions, recyclerFeaturedRooms, recyclerFeaturedServices;
+    private TextView tvSeeAllPromotions, tvSeeAllAttractions, tvSeeAllRooms, tvSeeAllServices, tvSeeAllTestimonials;
+    private RecyclerView recyclerPromotions, recyclerAttractions, recyclerFeaturedRooms, recyclerFeaturedServices, recyclerTestimonials;
+    private ViewPager2 viewPagerCarousel;
+    private LinearLayout indicatorContainer;
+    private ImageView btnCarouselLeft, btnCarouselRight;
 
     // Firebase
     private FirebaseFirestore db;
@@ -65,12 +78,22 @@ public class HomeFragment extends Fragment implements
     private AttractionAdapter attractionAdapter;
     private FeaturedRoomAdapter featuredRoomAdapter;
     private FeaturedServiceAdapter featuredServiceAdapter;
+    private CarouselAdapter carouselAdapter;
+    private TestimonialAdapter testimonialAdapter;
 
     // Data
     private List<Promotion> allPromotions = new ArrayList<>();
     private List<Attraction> allAttractions = new ArrayList<>();
     private List<Room> allRooms = new ArrayList<>();
     private List<Service> allServices = new ArrayList<>();
+    private List<Testimonial> allTestimonials = new ArrayList<>();
+    private List<Integer> carouselImages = Arrays.asList(
+            R.drawable.hotel1,
+            R.drawable.hotel2,
+            R.drawable.hotel3,
+            R.drawable.hotel4,
+            R.drawable.hotel5
+    );
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +112,7 @@ public class HomeFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         initViews(view);
+        setupCarousel();
         setupRecyclerViews();
         setupClickListeners();
         loadUserName();
@@ -105,10 +129,16 @@ public class HomeFragment extends Fragment implements
         tvSeeAllAttractions = view.findViewById(R.id.tvSeeAllAttractions);
         tvSeeAllRooms = view.findViewById(R.id.tvSeeAllRooms);
         tvSeeAllServices = view.findViewById(R.id.tvSeeAllServices);
+        tvSeeAllTestimonials = view.findViewById(R.id.tvSeeAllTestimonials);
         recyclerPromotions = view.findViewById(R.id.recyclerPromotions);
         recyclerAttractions = view.findViewById(R.id.recyclerAttractions);
         recyclerFeaturedRooms = view.findViewById(R.id.recyclerFeaturedRooms);
         recyclerFeaturedServices = view.findViewById(R.id.recyclerFeaturedServices);
+        recyclerTestimonials = view.findViewById(R.id.recyclerTestimonials);
+        viewPagerCarousel = view.findViewById(R.id.viewPagerCarousel);
+        indicatorContainer = view.findViewById(R.id.indicatorContainer);
+        btnCarouselLeft = view.findViewById(R.id.btnCarouselLeft);
+        btnCarouselRight = view.findViewById(R.id.btnCarouselRight);
     }
 
     private void setupRecyclerViews() {
@@ -131,6 +161,11 @@ public class HomeFragment extends Fragment implements
         featuredServiceAdapter = new FeaturedServiceAdapter(this);
         recyclerFeaturedServices.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerFeaturedServices.setAdapter(featuredServiceAdapter);
+
+        // Setup Testimonials RecyclerView
+        testimonialAdapter = new TestimonialAdapter(getContext(), new ArrayList<>());
+        recyclerTestimonials.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerTestimonials.setAdapter(testimonialAdapter);
     }
 
     private void setupClickListeners() {
@@ -143,19 +178,55 @@ public class HomeFragment extends Fragment implements
         tvSeeAllAttractions.setOnClickListener(v -> {
             // Navigate to attractions section
             Log.d(TAG, "See all attractions clicked");
-            Navigation.findNavController(v).navigate(R.id.attractionsFragment);
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.attractionsFragment);
+            
+            // Ensure bottom navigation is properly synced
+            if (getActivity() != null) {
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottom_nav);
+                if (bottomNav != null) {
+                    // Since attractions is not a main nav item, we'll keep home selected
+                    bottomNav.setSelectedItemId(R.id.homeFragment);
+                }
+            }
         });
 
         tvSeeAllRooms.setOnClickListener(v -> {
             // Navigate to rooms fragment
             Log.d(TAG, "Navigate to rooms fragment");
-            Navigation.findNavController(v).navigate(R.id.roomsFragment);
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.roomsFragment);
+            
+            // Ensure bottom navigation is properly synced
+            if (getActivity() != null) {
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottom_nav);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.roomsFragment);
+                }
+            }
         });
 
         tvSeeAllServices.setOnClickListener(v -> {
             // Navigate to services fragment
             Log.d(TAG, "Navigate to services fragment");
-            Navigation.findNavController(v).navigate(R.id.servicesFragment);
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.servicesFragment);
+            
+            // Ensure bottom navigation is properly synced
+            if (getActivity() != null) {
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottom_nav);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.servicesFragment);
+                }
+            }
+        });
+
+        tvSeeAllTestimonials.setOnClickListener(v -> {
+            Log.d(TAG, "See all testimonials clicked");
+            if (getContext() != null) {
+                Intent intent = new Intent(getContext(), TestimonialsActivity.class);
+                startActivity(intent);
+            }
         });
     }
 
@@ -186,7 +257,7 @@ public class HomeFragment extends Fragment implements
         showLoading(true);
 
         // Use AtomicInteger to track completion of all async operations
-        AtomicInteger pendingOperations = new AtomicInteger(4);
+        AtomicInteger pendingOperations = new AtomicInteger(5);
 
         // Load promotions
         loadPromotions(() -> {
@@ -215,6 +286,84 @@ public class HomeFragment extends Fragment implements
                 showLoading(false);
             }
         });
+
+        // Load testimonials
+        loadTestimonials(() -> {
+            if (pendingOperations.decrementAndGet() == 0) {
+                showLoading(false);
+            }
+        });
+    }
+
+    private void setupCarousel() {
+        // Setup carousel adapter
+        carouselAdapter = new CarouselAdapter(getContext(), carouselImages);
+        viewPagerCarousel.setAdapter(carouselAdapter);
+        
+        // Setup indicators
+        setupCarouselIndicators();
+        
+        // Setup page change callback for indicators
+        viewPagerCarousel.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                updateCarouselIndicators(position);
+            }
+        });
+        
+        // Setup arrow click listeners
+        btnCarouselLeft.setOnClickListener(v -> {
+            int currentItem = viewPagerCarousel.getCurrentItem();
+            if (currentItem > 0) {
+                viewPagerCarousel.setCurrentItem(currentItem - 1, true);
+            } else {
+                // Go to last item (wrap around)
+                viewPagerCarousel.setCurrentItem(carouselImages.size() - 1, true);
+            }
+        });
+        
+        btnCarouselRight.setOnClickListener(v -> {
+            int currentItem = viewPagerCarousel.getCurrentItem();
+            if (currentItem < carouselImages.size() - 1) {
+                viewPagerCarousel.setCurrentItem(currentItem + 1, true);
+            } else {
+                // Go to first item (wrap around)
+                viewPagerCarousel.setCurrentItem(0, true);
+            }
+        });
+    }
+
+    private void setupCarouselIndicators() {
+        indicatorContainer.removeAllViews();
+        
+        for (int i = 0; i < carouselImages.size(); i++) {
+            ImageView indicator = new ImageView(getContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(8, 0, 8, 0);
+            indicator.setLayoutParams(params);
+            
+            if (i == 0) {
+                indicator.setImageResource(R.drawable.carousel_indicator_active);
+            } else {
+                indicator.setImageResource(R.drawable.carousel_indicator_inactive);
+            }
+            
+            indicatorContainer.addView(indicator);
+        }
+    }
+
+    private void updateCarouselIndicators(int position) {
+        for (int i = 0; i < indicatorContainer.getChildCount(); i++) {
+            ImageView indicator = (ImageView) indicatorContainer.getChildAt(i);
+            if (i == position) {
+                indicator.setImageResource(R.drawable.carousel_indicator_active);
+            } else {
+                indicator.setImageResource(R.drawable.carousel_indicator_inactive);
+            }
+        }
     }
 
     private void loadPromotions(Runnable onComplete) {
@@ -422,6 +571,100 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    private void loadTestimonials(Runnable onComplete) {
+        Log.d(TAG, "Loading testimonials from Firestore...");
+        db.collection("testimonials")
+                .whereEqualTo("rating", 5)
+                .limit(4)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Log.d(TAG, "Testimonials query successful, documents found: " + queryDocumentSnapshots.size());
+                    allTestimonials.clear();
+
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        Log.d(TAG, "No testimonials found with rating 5");
+                        onComplete.run();
+                        return;
+                    }
+
+                    AtomicInteger pendingUserLookups = new AtomicInteger(queryDocumentSnapshots.size());
+
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            Testimonial testimonial = document.toObject(Testimonial.class);
+                            if (testimonial != null) {
+                                Log.d(TAG, "Processing testimonial: " + testimonial.getComment());
+                                
+                                // Fetch user name from users collection
+                                String userId = testimonial.getUserId();
+                                if (userId != null) {
+                                    db.collection("users").document(userId)
+                                            .get()
+                                            .addOnSuccessListener(userDoc -> {
+                                                if (userDoc.exists()) {
+                                                    String userName = userDoc.getString("name");
+                                                    if (userName != null) {
+                                                        testimonial.setUserName(userName);
+                                                    } else {
+                                                        testimonial.setUserName("Guest User");
+                                                    }
+                                                } else {
+                                                    testimonial.setUserName("Guest User");
+                                                }
+                                                
+                                                allTestimonials.add(testimonial);
+                                                
+                                                if (pendingUserLookups.decrementAndGet() == 0) {
+                                                    testimonialAdapter.updateTestimonials(allTestimonials);
+                                                    Log.d(TAG, "Loaded " + allTestimonials.size() + " testimonials with user names");
+                                                    onComplete.run();
+                                                }
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Log.e(TAG, "Error fetching user name for userId: " + userId, e);
+                                                testimonial.setUserName("Guest User");
+                                                allTestimonials.add(testimonial);
+                                                
+                                                if (pendingUserLookups.decrementAndGet() == 0) {
+                                                    testimonialAdapter.updateTestimonials(allTestimonials);
+                                                    Log.d(TAG, "Loaded " + allTestimonials.size() + " testimonials");
+                                                    onComplete.run();
+                                                }
+                                            });
+                                } else {
+                                    // No userId, set default name
+                                    testimonial.setUserName("Guest User");
+                                    allTestimonials.add(testimonial);
+                                    
+                                    if (pendingUserLookups.decrementAndGet() == 0) {
+                                        testimonialAdapter.updateTestimonials(allTestimonials);
+                                        Log.d(TAG, "Loaded " + allTestimonials.size() + " testimonials");
+                                        onComplete.run();
+                                    }
+                                }
+                            } else {
+                                if (pendingUserLookups.decrementAndGet() == 0) {
+                                    testimonialAdapter.updateTestimonials(allTestimonials);
+                                    Log.d(TAG, "Loaded " + allTestimonials.size() + " testimonials");
+                                    onComplete.run();
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error parsing testimonial document", e);
+                            if (pendingUserLookups.decrementAndGet() == 0) {
+                                testimonialAdapter.updateTestimonials(allTestimonials);
+                                Log.d(TAG, "Loaded " + allTestimonials.size() + " testimonials");
+                                onComplete.run();
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading testimonials", e);
+                    onComplete.run();
+                });
+    }
+
     private void showLoading(boolean show) {
         if (loadingOverlay != null && mainContent != null) {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -433,9 +676,18 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onPromotionClick(Promotion promotion) {
         Log.d(TAG, "Promotion clicked: " + promotion.getTitle());
-        // Navigate to rooms fragment as promotions are often room-related
+        // Navigate to promotions grid fragment
         if (getView() != null) {
-            Navigation.findNavController(getView()).navigate(R.id.roomsFragment);
+            NavController navController = Navigation.findNavController(getView());
+            navController.navigate(R.id.promotionsGridFragment);
+            
+            // Since promotions is not a main nav item, keep home selected
+            if (getActivity() != null) {
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottom_nav);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.homeFragment);
+                }
+            }
         }
     }
 
@@ -444,6 +696,7 @@ public class HomeFragment extends Fragment implements
         Log.d(TAG, "Attraction clicked: " + attraction.getName());
         if (getContext() == null) return;
         Intent intent = new Intent(getContext(), AttractionDetailsActivity.class);
+        intent.putExtra("attractionId", attraction.getAttractionId());
         intent.putExtra("name", attraction.getName());
         intent.putExtra("description", attraction.getDescription());
         intent.putExtra("distanceKM", attraction.getDistanceKM());
@@ -477,10 +730,20 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onServiceClick(Service service) {
         Log.d(TAG, "Service clicked: " + service.getName());
-        // Navigate to services fragment
-        if (getView() != null) {
-            Navigation.findNavController(getView()).navigate(R.id.servicesFragment);
+        // Open specific service details
+        if (getContext() == null) return;
+        Intent intent = new Intent(getContext(), ServiceDetailsActivity.class);
+        intent.putExtra("serviceId", service.getServiceId());
+        intent.putExtra("serviceName", service.getName());
+        intent.putExtra("serviceCategory", service.getCategory());
+        intent.putExtra("servicePrice", service.getPrice());
+        intent.putExtra("serviceDuration", service.getDurationMinutes());
+        intent.putExtra("serviceDescription", service.getDescription());
+        if (service.getImageUrls() != null) {
+            String[] imageUrls = service.getImageUrls().toArray(new String[0]);
+            intent.putExtra("imageUrls", imageUrls);
         }
+        startActivity(intent);
     }
 }
 

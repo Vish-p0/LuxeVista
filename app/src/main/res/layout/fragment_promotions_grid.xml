@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA">
+    android:background="@color/white">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -18,13 +18,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        app:startIconDrawable="@drawable/ic_search">
+        android:background="@color/light_blue_background"
+        app:startIconDrawable="@drawable/ic_search"
+        app:startIconTint="@color/dark_blue_primary"
+        app:hintTextColor="@color/dark_blue_primary"
+        app:boxBackgroundColor="@color/light_blue_background"
+        app:boxStrokeColor="@color/dark_blue_primary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Search promotions"
+            android:textColor="@color/dark_blue_primary"
+            android:textColorHint="@color/dark_blue_primary"
             android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -38,7 +45,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAll"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All"
@@ -47,7 +54,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipRooms"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rooms"
@@ -55,7 +62,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipServices"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Services"
@@ -72,7 +79,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAnyDiscount"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Any discount"
@@ -81,7 +88,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipDis10"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=">= 10%"
@@ -89,7 +96,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipDis20"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=">= 20%"
@@ -97,7 +104,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipDis30"
-            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            style="@style/PromotionsFilterChipStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=">= 30%"

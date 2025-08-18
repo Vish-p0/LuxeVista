@@ -12,6 +12,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -87,9 +88,7 @@ public class ProfileFragment extends Fragment {
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
         btnSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), SettingsActivity.class);
-            startActivity(intent);
-            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            Navigation.findNavController(v).navigate(R.id.settingsFragment);
         });
         btnHelp.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), HelpActivity.class);

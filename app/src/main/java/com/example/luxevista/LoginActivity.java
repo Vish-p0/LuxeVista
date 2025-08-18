@@ -38,8 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         textViewRegister.setOnClickListener(v -> {
             // Open the new two-step Signup flow
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-            // Finish LoginActivity so it can't pop back unexpectedly
-            finish();
+            // Don't finish LoginActivity so we can return to it
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         });
 

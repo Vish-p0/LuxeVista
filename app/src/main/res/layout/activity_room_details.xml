@@ -24,7 +24,9 @@
             app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
             app:titleTextColor="#1A1A1A"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="#666666" />
+            app:navigationIconTint="#666666"
+            app:contentInsetStartWithNavigation="16dp"
+            app:titleMarginStart="8dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="100dp">
+            android:paddingBottom="80dp">
 
             <!-- Image Carousel -->
             <com.google.android.material.card.MaterialCardView
@@ -443,5 +445,30 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bottom_nav_bg"
+        android:elevation="8dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="0dp"
+        app:itemIconSize="@dimen/bottom_nav_icon_size"
+        app:itemIconTint="@color/nav_icon_tint"
+        app:itemRippleColor="@null"
+        app:itemBackground="@android:color/transparent"
+        app:labelVisibilityMode="labeled"
+        app:itemPaddingTop="0dp"
+        app:itemPaddingBottom="8dp"
+        app:itemTextAppearanceActive="@style/TextAppearance.BottomNav.Active"
+        app:itemTextAppearanceInactive="@style/TextAppearance.BottomNav.Inactive"
+        app:itemTextColor="@color/bottom_nav_text_color"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

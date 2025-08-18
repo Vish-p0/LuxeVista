@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             bottomNav.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Optional: Configure top-level destinations to avoid showing Up button
+        // Configure top-level destinations to avoid showing Up button
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.homeFragment,
                 R.id.roomsFragment,
@@ -49,5 +49,34 @@ public class MainActivity extends AppCompatActivity {
                 R.id.bookingsFragment,
                 R.id.profileFragment
         ).build();
+        
+        // Note: ActionBar setup removed as this app doesn't use an ActionBar
+        // The navigation will still work properly with the bottom navigation
+        
+        // Handle fragment navigation from extras (e.g., from detail activities)
+        handleFragmentNavigation(navController);
+    }
+    
+    private void handleFragmentNavigation(NavController navController) {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String fragment = extras.getString("fragment");
+            if (fragment != null) {
+                switch (fragment) {
+                    case "rooms":
+                        navController.navigate(R.id.roomsFragment);
+                        break;
+                    case "services":
+                        navController.navigate(R.id.servicesFragment);
+                        break;
+                    case "bookings":
+                        navController.navigate(R.id.bookingsFragment);
+                        break;
+                    case "profile":
+                        navController.navigate(R.id.profileFragment);
+                        break;
+                }
+            }
+        }
     }
 }

@@ -16,8 +16,7 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
+import android.widget.Spinner;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -27,8 +26,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -49,7 +51,7 @@ public class SignupStep2Fragment extends Fragment {
 
     private TextInputLayout tilFullName, tilPhone, tilBirthday;
     private TextInputEditText etFullName, etPhone, etBirthday;
-    private ChipGroup chipGroupRoomType;
+    private Spinner spinnerRoomType;
     private MaterialSwitch switchNoSmoking;
     private MaterialButton btnBack, btnSignup;
 
@@ -67,7 +69,10 @@ public class SignupStep2Fragment extends Fragment {
         etFullName = view.findViewById(R.id.etFullName);
         etPhone = view.findViewById(R.id.etPhone);
         etBirthday = view.findViewById(R.id.etBirthday);
-        chipGroupRoomType = view.findViewById(R.id.chipGroupRoomType);
+        spinnerRoomType = view.findViewById(R.id.spinnerRoomType);
+        
+        // Set up room type spinner with data from database
+        loadRoomTypesFromDatabase();
         switchNoSmoking = view.findViewById(R.id.switchNoSmoking);
         btnBack = view.findViewById(R.id.btnBack);
         btnSignup = view.findViewById(R.id.btnSignup);
@@ -152,12 +157,55 @@ public class SignupStep2Fragment extends Fragment {
     }
 
     private String getSelectedRoomType() {
-        int checkedId = chipGroupRoomType.getCheckedChipId();
-        if (checkedId != View.NO_ID) {
-            Chip chip = chipGroupRoomType.findViewById(checkedId);
-            if (chip != null) return chip.getText().toString();
-        }
-        return "Standard Room";
+        return spinnerRoomType.getSelectedItem().toString();
+    }
+
+    private void loadRoomTypesFromDatabase() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        
+        db.collection("rooms")
+            .whereEqualTo("visible", true)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<String> roomNames = new ArrayList<>();
+                
+                for (var document : queryDocumentSnapshots) {
+                    String roomName = document.getString("name");
+                    if (roomName != null && !roomName.isEmpty()) {
+                        roomNames.add(roomName);
+                    }
+                }
+                
+                // Sort room names alphabetically
+                Collections.sort(roomNames);
+                
+                // Create and set adapter
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    requireContext(), 
+                    android.R.layout.simple_spinner_item, 
+                    roomNames
+                );
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerRoomType.setAdapter(adapter);
+                
+                // Set default selection if available
+                if (!roomNames.isEmpty()) {
+                    spinnerRoomType.setSelection(0);
+                }
+            })
+            .addOnFailureListener(e -> {
+                // Fallback to default room types if database fails
+                String[] defaultRoomTypes = {"Standard Room", "Deluxe Room", "Suite"};
+                ArrayAdapter<String> fallbackAdapter = new ArrayAdapter<>(
+                    requireContext(), 
+                    android.R.layout.simple_spinner_item, 
+                    defaultRoomTypes
+                );
+                fallbackAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerRoomType.setAdapter(fallbackAdapter);
+                
+                Toast.makeText(requireContext(), "Failed to load room types", Toast.LENGTH_SHORT).show();
+            });
     }
 
     private boolean validate() {

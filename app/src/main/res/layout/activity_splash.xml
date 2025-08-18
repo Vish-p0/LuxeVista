@@ -1,109 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_splash_background">
+    android:background="#FFFFFF"
+    tools:context=".SplashActivity">
 
-    <!-- App Logo/Icon -->
-    <ImageView
-        android:id="@+id/ivLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@drawable/ic_launcher_foreground"
-        android:scaleType="centerCrop"
-        android:background="@drawable/bg_logo_circle"
-        android:elevation="8dp"
+    
+
+    <!-- Lottie Animation -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimation"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.35" />
+        app:lottie_fileName="launch_animation.json"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_speed="0.5" />
 
-    <!-- App Name -->
+    <!-- Welcome Text -->
     <TextView
-        android:id="@+id/tvAppName"
+        android:id="@+id/tvWelcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LuxeVista"
-        android:textSize="32sp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="@font/poppins_bold"
-        android:letterSpacing="0.05"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/ivLogo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Tagline -->
-    <TextView
-        android:id="@+id/tvTagline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Luxury Hospitality Experience"
-        android:textSize="16sp"
-        android:textColor="#E3F2FD"
-        android:fontFamily="@font/poppins_regular"
-        android:letterSpacing="0.03"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvAppName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Loading Animation Container -->
-    <LinearLayout
-        android:id="@+id/loadingContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:text="@string/welcome_to_luxevista_resort"
+        android:textSize="18sp"
+        android:textColor="#1A1A1A"
+        android:fontFamily="@font/poppins_medium"
+        android:letterSpacing="0.02"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
         android:gravity="center"
-        android:layout_marginTop="80dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTagline"
+        app:layout_constraintTop_toBottomOf="@id/lottieAnimation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Custom Loading Animation -->
-        <LinearLayout
-            android:id="@+id/loadingDots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+    
 
-            <View
-                android:id="@+id/dot1"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/loading_dot" />
-
-            <View
-                android:id="@+id/dot2"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/loading_dot" />
-
-            <View
-                android:id="@+id/dot3"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/loading_dot" />
-
-        </LinearLayout>
-
-        <!-- Loading Text -->
-        <TextView
-            android:id="@+id/tvLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Loading..."
-            android:textSize="14sp"
-            android:textColor="#BBDEFB"
-            android:fontFamily="@font/poppins_medium"
-            android:alpha="0.8" />
-
-    </LinearLayout>
+    <!-- Loading Progress (Optional) -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="200dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="48dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="#007AFF"
+        app:trackColor="#E3F2FD"
+        app:trackCornerRadius="2dp"
+        app:layout_constraintTop_toBottomOf="@id/tvWelcomeText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
 
     <!-- Version Text -->
     <TextView
@@ -112,9 +67,9 @@
         android:layout_height="wrap_content"
         android:text="Version 1.0.0"
         android:textSize="12sp"
-        android:textColor="#90CAF9"
+        android:textColor="#999999"
         android:fontFamily="@font/poppins_regular"
-        android:alpha="0.7"
+        android:alpha="0.8"
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

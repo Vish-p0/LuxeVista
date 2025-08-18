@@ -8,6 +8,14 @@
     <color name="app_blue_dark">#0A84FF</color>
     <color name="app_blue_light">#1976D2</color>
     
+    <!-- New Dark Blue and Light Blue Theme -->
+    <color name="dark_blue_primary">#1A237E</color>
+    <color name="dark_blue_secondary">#283593</color>
+    <color name="light_blue_primary">#42A5F5</color>
+    <color name="light_blue_secondary">#64B5F6</color>
+    <color name="light_blue_accent">#90CAF9</color>
+    <color name="light_blue_background">#E3F2FD</color>
+    
     <!-- Legacy Primary Colors -->
     <color name="primary">#4CAF50</color>
     <color name="primary_dark">#388E3C</color>
@@ -16,7 +24,7 @@
     <!-- Background Colors -->
     <color name="background_primary">#F8F9FA</color>
     <color name="background_secondary">#FFFFFF</color>
-    <color name="background_tertiary">#E8F5E9</color>
+    <color name="background_tertiary">#E3F2FD</color>
     <color name="surface">#FFFFFF</color>
     
     <!-- Text Colors -->

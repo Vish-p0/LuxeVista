@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Attraction {
+    private String attractionId;
     private String name;
     private String description;
     private double distanceKM;
@@ -26,6 +27,10 @@ public class Attraction {
     }
 
     // Getters
+    public String getAttractionId() {
+        return attractionId;
+    }
+    
     public String getName() {
         return name;
     }
@@ -47,6 +52,10 @@ public class Attraction {
     }
 
     // Setters
+    public void setAttractionId(String attractionId) {
+        this.attractionId = attractionId;
+    }
+    
     public void setName(String name) {
         this.name = name;
     }

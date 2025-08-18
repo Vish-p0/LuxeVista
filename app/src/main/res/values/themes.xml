@@ -16,7 +16,8 @@
     <style name="Theme.LuxeVista.Splash" parent="Theme.LuxeVista">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@drawable/gradient_splash_background</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowSplashScreenBackground">@android:color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
@@ -35,7 +36,17 @@
         <item name="strokeColor">@color/filter_unselected</item>
         <item name="android:textColor">@color/filter_text_unselected</item>
         <item name="backgroundTint">@android:color/transparent</item>
-        <item name="rippleColor">@color/primary_light</item>
+        <item name="rippleColor">@color/light_blue_background</item>
+    </style>
+    
+    <!-- Promotions Filter Chip Style -->
+    <style name="PromotionsFilterChipStyle" parent="Widget.Material3.Chip.Assist.Elevated">
+        <item name="android:textColor">@color/dark_blue_primary</item>
+        <item name="chipBackgroundColor">@color/light_blue_background</item>
+        <item name="chipStrokeColor">@color/dark_blue_primary</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
     </style>
 
     

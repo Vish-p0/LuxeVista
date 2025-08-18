@@ -164,6 +164,7 @@ public class AttractionsFragment extends Fragment implements AttractionGridAdapt
     public void onAttractionClick(Attraction attraction) {
         if (getContext() == null) return;
         android.content.Intent intent = new android.content.Intent(getContext(), AttractionDetailsActivity.class);
+        intent.putExtra("attractionId", attraction.getAttractionId());
         intent.putExtra("name", attraction.getName());
         intent.putExtra("description", attraction.getDescription());
         intent.putExtra("distanceKM", attraction.getDistanceKM());

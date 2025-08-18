@@ -2,13 +2,14 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="280dp"
+    android:layout_width="180dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="6dp"
     app:strokeWidth="0dp"
+    app:cardBackgroundColor="@color/light_blue_background"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
@@ -19,7 +20,7 @@
         <!-- Promotion Image -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp">
+            android:layout_height="120dp">
 
             <ImageView
                 android:id="@+id/ivPromotionImage"
@@ -58,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvPromotionTitle"
@@ -66,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:text="Summer Special"
                 android:textColor="#1A1A1A"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:fontFamily="@font/poppins_bold"
                 android:maxLines="1"
                 android:ellipsize="end"

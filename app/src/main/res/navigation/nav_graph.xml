@@ -39,6 +39,11 @@
         android:name="com.example.luxevista.PromotionsGridFragment"
         android:label="Promotions" />
 
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.luxevista.SettingsFragment"
+        android:label="Settings" />
+
 </navigation>
 
 

@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.luxevista.adapters.AmenityAdapter;
 import com.example.luxevista.adapters.RoomImageAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -55,6 +58,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
     private LinearLayout totalPriceLayout;
     private TextView tvTotalPrice, tvTotalNights;
     private MaterialButton btnBookNow;
+    private BottomNavigationView bottomNavigation;
 
     // Data
     private String roomId, roomName, roomType, currency, description;
@@ -92,6 +96,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
         setupDatePickers();
         setupBookingButton();
         displayRoomInfo();
+        setupBottomNavigation();
     }
 
     private void initViews() {
@@ -112,6 +117,7 @@ public class RoomDetailsActivity extends AppCompatActivity {
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         tvTotalNights = findViewById(R.id.tvTotalNights);
         btnBookNow = findViewById(R.id.btnBookNow);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
     private void loadDataFromIntent() {
@@ -194,6 +200,42 @@ public class RoomDetailsActivity extends AppCompatActivity {
         }
     }
 
+    private void setupBottomNavigation() {
+        try {
+            bottomNavigation.setItemActiveIndicatorEnabled(false);
+        } catch (Throwable ignored) { }
+        bottomNavigation.setItemRippleColor(null);
+        bottomNavigation.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.homeFragment) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.roomsFragment) {
+                // Already in rooms section
+                return true;
+            } else if (itemId == R.id.servicesFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "services"));
+                finish();
+                return true;
+            } else if (itemId == R.id.bookingsFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "bookings"));
+                finish();
+                return true;
+            } else if (itemId == R.id.profileFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "profile"));
+                finish();
+                return true;
+            }
+            return false;
+        });
+        
+        // Set rooms as selected
+        bottomNavigation.setSelectedItemId(R.id.roomsFragment);
+    }
+
     private void setupAmenities() {
         amenityAdapter = new AmenityAdapter();
         recyclerAmenities.setLayoutManager(new LinearLayoutManager(this));
@@ -240,20 +282,43 @@ public class RoomDetailsActivity extends AppCompatActivity {
         db.collection("rooms").document(roomId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Map<String, Object> amenityMap = (Map<String, Object>) documentSnapshot.get("amenities");
-                        if (amenityMap != null) {
-                            amenities.clear();
-                            for (Map.Entry<String, Object> entry : amenityMap.entrySet()) {
-                                if (Boolean.TRUE.equals(entry.getValue())) {
-                                    amenities.add(new AmenityItem(entry.getKey(), getAmenityDisplayName(entry.getKey())));
-                                }
-                            }
-                            amenityAdapter.notifyDataSetChanged();
+                    if (!documentSnapshot.exists()) {
+                        return;
+                    }
+                    Map<String, Object> amenityMap = (Map<String, Object>) documentSnapshot.get("amenities");
+                    if (amenityMap == null) {
+                        // No amenities field
+                        amenityAdapter.updateAmenities(new ArrayList<>());
+                        return;
+                    }
+
+                    amenities.clear();
+                    for (Map.Entry<String, Object> entry : amenityMap.entrySet()) {
+                        if (isTruthy(entry.getValue())) {
+                            String key = entry.getKey();
+                            amenities.add(new AmenityItem(key, getAmenityDisplayName(key)));
                         }
                     }
+
+                    // Push the updated amenity keys into the adapter
+                    List<String> amenityKeys = new ArrayList<>();
+                    for (AmenityItem item : amenities) {
+                        amenityKeys.add(item.getKey());
+                    }
+                    amenityAdapter.updateAmenities(amenityKeys);
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error loading amenities", e));
+    }
+
+    private boolean isTruthy(Object value) {
+        if (value == null) return false;
+        if (value instanceof Boolean) return (Boolean) value;
+        if (value instanceof Number) return ((Number) value).intValue() != 0;
+        if (value instanceof String) {
+            String s = ((String) value).trim();
+            return "true".equalsIgnoreCase(s) || "1".equals(s) || "yes".equalsIgnoreCase(s);
+        }
+        return false;
     }
 
     private String getAmenityDisplayName(String amenityKey) {

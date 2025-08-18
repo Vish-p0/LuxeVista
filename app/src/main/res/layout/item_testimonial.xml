@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:background="@drawable/testimonial_card_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/light_blue_background">
+
+        <TextView
+            android:id="@+id/tvTestimonialRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="★★★★★"
+            android:textColor="#FFD700"
+            android:textSize="16sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvTestimonialComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Excellent service and beautiful rooms!"
+            android:textColor="@color/dark_blue_primary"
+            android:textSize="14sp"
+            android:fontFamily="@font/poppins_regular"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginBottom="12dp"
+            android:minLines="3"
+            android:maxLines="4"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvTestimonialUserName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="John Doe"
+                android:textColor="@color/dark_blue_primary"
+                android:textSize="13sp"
+                android:fontFamily="@font/poppins_semi_bold" />
+
+            <TextView
+                android:id="@+id/tvTestimonialDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dec 15, 2024"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:fontFamily="@font/poppins_regular" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

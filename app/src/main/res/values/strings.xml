@@ -31,6 +31,8 @@
     <string name="dont_have_account">Don\'t have an account? </string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
+    <string name="sign_up_underlined"><u>Sign Up</u></string>
+    <string name="login_underlined"><u>Login</u></string>
     
     <!-- Security -->
     <string name="security_settings">Security Settings</string>
@@ -122,6 +124,16 @@
     <string name="coral_reef_snorkeling">Coral Reef Snorkeling</string>
     <string name="explore_coral_reefs">Explore vibrant coral reefs and marine life</string>
     <string name="distance_short">1.2 km</string>
+    <string name="about_attraction">About this Attraction</string>
+    <string name="features">Features</string>
+    <string name="opening_hours">Open 24/7</string>
+    <string name="photo_opportunities">Photo Spots</string>
+    <string name="get_directions">Get Directions</string>
+    <string name="save_attraction">Save</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="added_to_favorites">Added to favorites!</string>
+    <string name="removed_from_favorites">Removed from favorites!</string>
     
     <!-- Rooms -->
     <string name="room_type_deluxe">Deluxe</string>
@@ -206,9 +218,38 @@
     <string name="experience_unparalleled">Experience unparalleled comfort and elegance</string>
     <string name="crafting_perfect_stay">Crafting your perfect stay...</string>
     <string name="welcome_to_luxury">Welcome to luxury</string>
+    <string name="welcome_to_luxevista_resort">Welcome to LuxeVista Resort</string>
     
     <!-- Amenities -->
     <string name="amenity_wifi">WiFi</string>
+    
+    <!-- Settings -->
+    <string name="general_settings">General Settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="receive_push_notifications">Receive push notifications</string>
+    <string name="booking_reminders">Booking reminders</string>
+    <string name="promotion_notifications">Promotion notifications</string>
+    <string name="app_updates">App updates</string>
+    <string name="language">Language</string>
+    <string name="select_language">Select language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="enable_dark_theme">Enable dark theme</string>
+    <string name="manage_security_settings">Manage passcode and security settings</string>
+    <string name="account_management">Account Management</string>
+    <string name="change_password">Change Password</string>
+    <string name="update_account_password">Update your account password</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="permanently_delete_account">Permanently delete your account</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="view_terms_conditions">View terms and conditions</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="view_privacy_policy">View our privacy policy</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="get_help_contact_us">Get help and contact us</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="password_requirements">Password must be at least 6 characters long</string>
     
     <!-- Date Formats -->
     <string name="date_format_short">MMM dd, yyyy</string>

@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.luxevista.adapters.RoomImageAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -50,6 +53,7 @@ public class ServiceDetailsActivity extends AppCompatActivity {
     private LinearLayout bookingSummaryLayout;
     private TextView tvSummaryService, tvSummaryDuration, tvSummaryPrice;
     private MaterialButton btnBookNow;
+    private BottomNavigationView bottomNavigation;
 
     // Data
     private String serviceId, serviceName, serviceCategory, currency, description;
@@ -86,6 +90,7 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         setupDateTimeSelection();
         setupBookingButton();
         displayServiceInfo();
+        setupBottomNavigation();
     }
 
     private void initViews() {
@@ -105,6 +110,7 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         tvSummaryDuration = findViewById(R.id.tvSummaryDuration);
         tvSummaryPrice = findViewById(R.id.tvSummaryPrice);
         btnBookNow = findViewById(R.id.btnBookNow);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 
     private void loadDataFromIntent() {
@@ -386,6 +392,42 @@ public class ServiceDetailsActivity extends AppCompatActivity {
                 })
                 .setCancelable(false)
                 .show();
+    }
+
+    private void setupBottomNavigation() {
+        try {
+            bottomNavigation.setItemActiveIndicatorEnabled(false);
+        } catch (Throwable ignored) { }
+        bottomNavigation.setItemRippleColor(null);
+        bottomNavigation.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.homeFragment) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            } else if (itemId == R.id.roomsFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "rooms"));
+                finish();
+                return true;
+            } else if (itemId == R.id.servicesFragment) {
+                // Already in services section
+                return true;
+            } else if (itemId == R.id.bookingsFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "bookings"));
+                finish();
+                return true;
+            } else if (itemId == R.id.profileFragment) {
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "profile"));
+                finish();
+                return true;
+            }
+            return false;
+        });
+        
+        // Set services as selected
+        bottomNavigation.setSelectedItemId(R.id.servicesFragment);
     }
 
     interface BookingIdCallback {

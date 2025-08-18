@@ -1,23 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F8F9FA">
+    android:background="@color/background_primary">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- Full-Screen Image Carousel -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#FFFFFF"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:titleTextColor="#1A1A1A" />
+        android:layout_height="400dp">
 
+        <!-- Image ViewPager2 -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerImages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_secondary" />
+
+        <!-- Gradient Overlay for better text readability -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_overlay_dark"
+            android:alpha="0.3" />
+
+        <!-- Back Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_arrow_back"
+            app:fabSize="mini"
+            app:backgroundTint="@color/background_secondary"
+            app:tint="@color/text_primary"
+            app:elevation="4dp"
+            android:contentDescription="@string/back" />
+
+        <!-- Image Counter -->
+        <TextView
+            android:id="@+id/tvImageCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_image_counter"
+            android:padding="8dp"
+            android:text="1 / 3"
+            android:textColor="@color/text_white"
+            android:textSize="12sp"
+            android:fontFamily="@font/poppins_medium"
+            android:visibility="gone" />
+
+        <!-- Page Indicators -->
+        <LinearLayout
+            android:id="@+id/indicatorContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="@drawable/bg_indicator_background" />
+
+    </RelativeLayout>
+
+    <!-- Content Section -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="400dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -25,70 +84,192 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPagerImages"
-                android:layout_width="match_parent"
-                android:layout_height="260dp" />
-
-            <LinearLayout
-                android:id="@+id/indicatorContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
-
+            <!-- Main Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp"
+                android:backgroundTint="@color/background_secondary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="24dp">
 
-                    <TextView
-                        android:id="@+id/tvName"
+                    <!-- Title and Distance -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Sky Dining"
-                        android:textColor="#1A1A1A"
-                        android:textSize="20sp"
-                        android:fontFamily="@font/poppins_bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/sky_dining"
+                                android:textColor="@color/text_primary"
+                                android:textSize="24sp"
+                                android:fontFamily="@font/poppins_bold"
+                                android:lineSpacingExtra="2dp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="4dp">
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_location_pin"
+                                    app:tint="@color/app_blue"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:id="@+id/tvDistance"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/distance_away"
+                                    android:textColor="@color/app_blue"
+                                    android:textSize="14sp"
+                                    android:fontFamily="@font/poppins_medium" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Rating Badge (if available) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp"
+                            android:backgroundTint="@color/app_blue">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp">
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_star"
+                                    app:tint="@color/text_white"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="4.8"
+                                    android:textColor="@color/text_white"
+                                    android:textSize="14sp"
+                                    android:fontFamily="@font/poppins_semi_bold" />
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                    <!-- Description Section -->
                     <TextView
-                        android:id="@+id/tvDistance"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="2.0 km away"
-                        android:textColor="#666666"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/poppins_regular" />
+                        android:text="@string/about_attraction"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/poppins_semi_bold"
+                        android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Description here"
-                        android:textColor="#333333"
-                        android:textSize="14sp"
-                        android:layout_marginTop="12dp"
-                        android:lineSpacingExtra="2dp"
+                        android:text="@string/attraction_description"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp"
+                        android:lineSpacingExtra="4dp"
                         android:fontFamily="@font/poppins_regular"
                         tools:text="Enjoy a fine dining experience in the sky with panoramic views." />
 
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Centered Favorites Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:layout_margin="24dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="@string/add_to_favorites"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:textColor="@color/text_white"
+                android:fontFamily="@font/poppins_semi_bold"
+                app:icon="@drawable/ic_bookmark"
+                app:iconTint="@color/text_white"
+                app:iconGravity="textStart"
+                app:cornerRadius="12dp"
+                android:backgroundTint="@color/app_blue" />
+
+            <!-- Bottom Spacing -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
+
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
-</LinearLayout>
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bottom_nav_bg"
+        android:elevation="8dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="0dp"
+        app:itemIconSize="@dimen/bottom_nav_icon_size"
+        app:itemIconTint="@color/nav_icon_tint"
+        app:itemRippleColor="@null"
+        app:itemBackground="@android:color/transparent"
+        app:labelVisibilityMode="labeled"
+        app:itemPaddingTop="0dp"
+        app:itemPaddingBottom="8dp"
+        app:itemTextAppearanceActive="@style/TextAppearance.BottomNav.Active"
+        app:itemTextAppearanceInactive="@style/TextAppearance.BottomNav.Inactive"
+        app:itemTextColor="@color/bottom_nav_text_color"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

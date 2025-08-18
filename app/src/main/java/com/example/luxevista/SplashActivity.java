@@ -1,30 +1,41 @@
 package com.example.luxevista;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 3000; // 3 seconds
+    private static final int WELCOME_TEXT_DELAY = 1000; // 1 second
     
-    private ImageView ivLogo;
-    private TextView tvAppName, tvTagline;
-    private View dot1, dot2, dot3;
-    private TextView tvLoading;
+    private LottieAnimationView lottieAnimation;
+    private TextView tvWelcomeText;
+    private TextView tvVersion;
+    private LinearProgressIndicator progressBar;
     
     private FirebaseAuth mAuth;
+    private boolean animationComplete = false;
+    private boolean timerComplete = false;
+    private boolean hasNavigated = false;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private Runnable welcomeTextRunnable;
+    private Runnable versionTextRunnable;
+    private Runnable progressBarRunnable;
+    private Runnable timerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,79 +51,110 @@ public class SplashActivity extends AppCompatActivity {
         // Start animations
         startAnimations();
         
-        // Navigate after delay
-        navigateAfterDelay();
+        // Set up navigation timer
+        setupNavigationTimer();
     }
     
     private void initViews() {
-        ivLogo = findViewById(R.id.ivLogo);
-        tvAppName = findViewById(R.id.tvAppName);
-        tvTagline = findViewById(R.id.tvTagline);
-        dot1 = findViewById(R.id.dot1);
-        dot2 = findViewById(R.id.dot2);
-        dot3 = findViewById(R.id.dot3);
-        tvLoading = findViewById(R.id.tvLoading);
+        lottieAnimation = findViewById(R.id.lottieAnimation);
+        tvWelcomeText = findViewById(R.id.tvWelcomeText);
+        tvVersion = findViewById(R.id.tvVersion);
+        progressBar = findViewById(R.id.progressBar);
+        
+        // Initially hide animated elements
+        tvWelcomeText.setAlpha(0f);
+        tvVersion.setAlpha(0f);
+        lottieAnimation.setAlpha(0f);
     }
     
     private void startAnimations() {
-        // Logo animation
-        Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.logo_scale_animation);
-        ivLogo.startAnimation(logoAnimation);
+        // Lottie animation fade in
+        lottieAnimation.animate()
+            .alpha(1f)
+            .setDuration(600)
+            .setStartDelay(500)
+            .setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    // Animation is now visible, mark as complete
+                    animationComplete = true;
+                    checkAndNavigate();
+                }
+            })
+            .start();
         
-        // Text animations with staggered delays
-        Animation fadeInUp = AnimationUtils.loadAnimation(this, R.anim.fade_in_up);
+        // Welcome text animation
+        welcomeTextRunnable = () -> {
+            tvWelcomeText.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(600)
+                .start();
+        };
+        mainHandler.postDelayed(welcomeTextRunnable, WELCOME_TEXT_DELAY);
         
-        // App name animation
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            tvAppName.setVisibility(View.VISIBLE);
-            tvAppName.startAnimation(fadeInUp);
-        }, 400);
+        // Version text animation
+        versionTextRunnable = () -> {
+            tvVersion.animate()
+                .alpha(1f)
+                .setDuration(400)
+                .start();
+        };
+        mainHandler.postDelayed(versionTextRunnable, WELCOME_TEXT_DELAY + 300);
         
-        // Tagline animation
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            tvTagline.setVisibility(View.VISIBLE);
-            Animation taglineAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in_up);
-            tvTagline.startAnimation(taglineAnim);
-        }, 800);
-        
-        // Loading container animation
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            findViewById(R.id.loadingContainer).setVisibility(View.VISIBLE);
-            Animation loadingAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in_up);
-            findViewById(R.id.loadingContainer).startAnimation(loadingAnim);
-            
-            // Start dot animations
-            startLoadingDotsAnimation();
-        }, 1200);
-        
-        // Initially hide animated elements
-        tvAppName.setVisibility(View.INVISIBLE);
-        tvTagline.setVisibility(View.INVISIBLE);
-        findViewById(R.id.loadingContainer).setVisibility(View.INVISIBLE);
+        // Optional: Show progress bar after a delay
+        progressBarRunnable = () -> {
+            if (progressBar != null) {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.animate()
+                    .alpha(1f)
+                    .setDuration(300)
+                    .start();
+            }
+        };
+        mainHandler.postDelayed(progressBarRunnable, WELCOME_TEXT_DELAY + 600);
     }
     
-    private void startLoadingDotsAnimation() {
-        // Create staggered dot animations
-        Animation dotAnim1 = AnimationUtils.loadAnimation(this, R.anim.loading_dot_animation);
-        Animation dotAnim2 = AnimationUtils.loadAnimation(this, R.anim.loading_dot_animation);
-        Animation dotAnim3 = AnimationUtils.loadAnimation(this, R.anim.loading_dot_animation);
-        
-        // Start animations with delays
-        dot1.startAnimation(dotAnim1);
-        
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            dot2.startAnimation(dotAnim2);
-        }, 200);
-        
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            dot3.startAnimation(dotAnim3);
-        }, 400);
+    private void setupNavigationTimer() {
+        timerRunnable = () -> {
+            timerComplete = true;
+            checkAndNavigate();
+        };
+        mainHandler.postDelayed(timerRunnable, SPLASH_DURATION);
     }
     
-    private void navigateAfterDelay() {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            checkAuthenticationAndNavigate();
-        }, SPLASH_DURATION);
+    private void checkAndNavigate() {
+        // Navigate only when both animation is visible and timer is complete
+        if (hasNavigated) return;
+        if (animationComplete && timerComplete) {
+            // Both conditions met; perform fade-out then navigate once
+            navigateToNextScreen();
+        }
+    }
+    
+    private void navigateToNextScreen() {
+        // Fade out all elements before navigation
+        fadeOutAndNavigate();
+    }
+    
+    private void fadeOutAndNavigate() {
+        // Fade out all visible elements
+        lottieAnimation.animate().alpha(0f).setDuration(300);
+        tvWelcomeText.animate().alpha(0f).setDuration(300);
+        tvVersion.animate().alpha(0f).setDuration(300);
+        
+        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.animate().alpha(0f).setDuration(300);
+        }
+        
+        // Navigate after fade out
+        mainHandler.postDelayed(this::startNextIfNeeded, 350);
+    }
+
+    private void startNextIfNeeded() {
+        if (hasNavigated) return;
+        hasNavigated = true;
+        checkAuthenticationAndNavigate();
     }
     
     private void checkAuthenticationAndNavigate() {
@@ -142,7 +184,35 @@ public class SplashActivity extends AppCompatActivity {
     }
     
     @Override
-    @SuppressWarnings("MissingSuperCall")
+    protected void onPause() {
+        super.onPause();
+        // Pause Lottie animation to save resources
+        if (lottieAnimation != null) {
+            lottieAnimation.pauseAnimation();
+        }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Resume Lottie animation
+        if (lottieAnimation != null && !lottieAnimation.isAnimating()) {
+            lottieAnimation.resumeAnimation();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Ensure no pending callbacks can fire after Activity is finished
+        if (welcomeTextRunnable != null) mainHandler.removeCallbacks(welcomeTextRunnable);
+        if (versionTextRunnable != null) mainHandler.removeCallbacks(versionTextRunnable);
+        if (progressBarRunnable != null) mainHandler.removeCallbacks(progressBarRunnable);
+        if (timerRunnable != null) mainHandler.removeCallbacks(timerRunnable);
+        mainHandler.removeCallbacksAndMessages(null);
+    }
+    
+    @Override
     public void onBackPressed() {
         // Disable back button on splash screen
         // Intentionally not calling super.onBackPressed() to prevent user from going back
