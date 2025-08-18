@@ -16,6 +16,10 @@ public class Service {
     private int durationMinutes;
     private List<String> imageUrls;
 
+    // Availability
+    private int defaultDailySlots;
+    private java.util.Map<String, Long> availability; // date (yyyy-MM-dd) -> booked count
+
     // Default constructor required for Firestore
     public Service() {}
 
@@ -65,6 +69,9 @@ public class Service {
         return imageUrls;
     }
 
+    public int getDefaultDailySlots() { return defaultDailySlots; }
+    public java.util.Map<String, Long> getAvailability() { return availability; }
+
     // Setters
     public void setServiceId(String serviceId) {
         this.serviceId = serviceId;
@@ -97,6 +104,9 @@ public class Service {
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+
+    public void setDefaultDailySlots(int defaultDailySlots) { this.defaultDailySlots = defaultDailySlots; }
+    public void setAvailability(java.util.Map<String, Long> availability) { this.availability = availability; }
 
     // Helper methods
     @Exclude
@@ -149,5 +159,17 @@ public class Service {
         }
         
         return selectedCategories.contains(category);
+    }
+
+    @Exclude
+    public int getRemainingForDate(String dateKey) {
+        int dailyCapacity = defaultDailySlots;
+        if (dailyCapacity <= 0) return 0;
+        long booked = 0L;
+        if (availability != null && availability.containsKey(dateKey) && availability.get(dateKey) != null) {
+            booked = availability.get(dateKey);
+        }
+        long remaining = (long) dailyCapacity - booked;
+        return (int) Math.max(0L, remaining);
     }
 }

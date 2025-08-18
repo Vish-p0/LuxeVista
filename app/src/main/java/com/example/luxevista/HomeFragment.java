@@ -68,6 +68,7 @@ public class HomeFragment extends Fragment implements
     private ViewPager2 viewPagerCarousel;
     private LinearLayout indicatorContainer;
     private ImageView btnCarouselLeft, btnCarouselRight;
+    private com.google.android.material.floatingactionbutton.FloatingActionButton fabStartBooking;
 
     // Firebase
     private FirebaseFirestore db;
@@ -139,6 +140,7 @@ public class HomeFragment extends Fragment implements
         indicatorContainer = view.findViewById(R.id.indicatorContainer);
         btnCarouselLeft = view.findViewById(R.id.btnCarouselLeft);
         btnCarouselRight = view.findViewById(R.id.btnCarouselRight);
+        fabStartBooking = view.findViewById(R.id.fabStartBooking);
     }
 
     private void setupRecyclerViews() {
@@ -228,6 +230,16 @@ public class HomeFragment extends Fragment implements
                 startActivity(intent);
             }
         });
+
+        // Start Booking Flow
+        if (fabStartBooking != null) {
+            fabStartBooking.setOnClickListener(v -> {
+                Log.d(TAG, "FAB clicked: start booking flow");
+                NavController navController = Navigation.findNavController(v);
+                navController.navigate(R.id.bookingFlowFragment);
+            });
+            // Accent styling (icon via XML). Background tint is set in layout; keep ripple natural.
+        }
     }
 
     private void loadUserName() {

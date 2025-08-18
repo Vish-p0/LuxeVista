@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_section_border"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Header Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <!-- Icon -->
+        <ImageView
+            android:id="@+id/iconType"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_bookings"
+            android:background="@drawable/bg_logo_circle_small"
+            android:padding="12dp"
+            android:tint="@color/dark_blue_primary"
+            android:contentDescription="Booking type icon" />
+
+        <!-- Booking Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/textBookingId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Booking #123"
+                android:textSize="18sp"
+                android:textColor="@color/dark_blue_primary"
+                android:fontFamily="@font/poppins_bold"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/textSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2 rooms + 1 service"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/poppins_medium" />
+
+        </LinearLayout>
+
+        <!-- Status Badge -->
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/poppins_bold"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:background="@drawable/bg_availability_badge"
+            android:layout_marginStart="16dp" />
+
+    </LinearLayout>
+
+    <!-- Dates Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_calendar"
+            android:tint="@color/light_blue_primary"
+            android:contentDescription="Calendar icon" />
+
+        <TextView
+            android:id="@+id/textDates"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Check-in: Sep 20, 2025 at 2:00 PM\nCheck-out: Sep 23, 2025 at 11:00 AM"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:fontFamily="@font/poppins_regular"
+            android:layout_marginStart="12dp"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+
+    <!-- Bottom Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Price -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Amount"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/poppins_medium" />
+
+            <TextView
+                android:id="@+id/textPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$720.00"
+                android:textSize="20sp"
+                android:textColor="@color/light_blue_primary"
+                android:fontFamily="@font/poppins_bold" />
+
+        </LinearLayout>
+
+        <!-- View Details Button -->
+        <Button
+            android:id="@+id/btnViewDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="View Details"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/dark_blue_primary"
+            android:fontFamily="@font/poppins_medium"
+            android:paddingHorizontal="16dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

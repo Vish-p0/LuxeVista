@@ -35,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BookingsFragment extends Fragment implements BookingAdapter.OnBookingClickListener {
+public class BookingsFragment extends Fragment implements NewBookingAdapter.OnBookingClickListener {
 
     private static final String TAG = "BookingsFragment";
     
@@ -54,8 +54,8 @@ public class BookingsFragment extends Fragment implements BookingAdapter.OnBooki
     private String firebaseAuthUid;
     
     // Data
-    private BookingAdapter adapter;
-    private List<Booking> allBookings = new ArrayList<>();
+    private NewBookingAdapter adapter;
+    private List<NewBooking> allBookings = new ArrayList<>();
     private String currentFilter = "All";
     private String currentSearchQuery = "";
 
@@ -102,7 +102,7 @@ public class BookingsFragment extends Fragment implements BookingAdapter.OnBooki
     }
     
     private void setupRecyclerView() {
-        adapter = new BookingAdapter(this);
+        adapter = new NewBookingAdapter(this);
         recyclerViewBookings.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewBookings.setAdapter(adapter);
     }
@@ -303,10 +303,13 @@ public class BookingsFragment extends Fragment implements BookingAdapter.OnBooki
                     
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         try {
-                            Booking booking = document.toObject(Booking.class);
+                            NewBooking booking = document.toObject(NewBooking.class);
                             if (booking != null) {
-                                // Fetch item name based on type and itemId
-                                fetchItemName(booking, () -> {
+                                // Set the booking ID from the document ID
+                                booking.setBookingId(document.getId());
+                                
+                                // Fetch item names for rooms and services
+                                fetchItemNames(booking, () -> {
                                     allBookings.add(booking);
                                     
                                     // Check if all requests are completed
@@ -356,42 +359,78 @@ public class BookingsFragment extends Fragment implements BookingAdapter.OnBooki
                 });
     }
     
-    private void fetchItemName(Booking booking, Runnable onComplete) {
-        if (booking.getItemId() == null || booking.getType() == null) {
-            booking.setItemName("Unknown Item");
+    private void fetchItemNames(NewBooking booking, Runnable onComplete) {
+        AtomicInteger pendingRequests = new AtomicInteger(0);
+        
+        // Count total pending requests
+        if (booking.getRooms() != null) pendingRequests.addAndGet(booking.getRooms().size());
+        if (booking.getServices() != null) pendingRequests.addAndGet(booking.getServices().size());
+        
+        if (pendingRequests.get() == 0) {
             onComplete.run();
             return;
         }
         
-        String collection = "room".equals(booking.getType()) ? "rooms" : "services";
+        // Fetch room names
+        if (booking.getRooms() != null) {
+            for (NewBooking.RoomBooking room : booking.getRooms()) {
+                db.collection("rooms")
+                        .document(room.getRoomId())
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String roomName = documentSnapshot.getString("name");
+                                if (roomName != null && !roomName.isEmpty()) {
+                                    room.setRoomName(roomName);
+                                }
+                            }
+                            
+                            if (pendingRequests.decrementAndGet() == 0) {
+                                onComplete.run();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Error fetching room name for " + room.getRoomId(), e);
+                            if (pendingRequests.decrementAndGet() == 0) {
+                                onComplete.run();
+                            }
+                        });
+            }
+        }
         
-        db.collection(collection)
-                .document(booking.getItemId())
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String itemName = documentSnapshot.getString("name");
-                        if (itemName == null || itemName.isEmpty()) {
-                            itemName = documentSnapshot.getString("title");
-                        }
-                        booking.setItemName(itemName != null ? itemName : "Unknown Item");
-                    } else {
-                        booking.setItemName("Item Not Found");
-                    }
-                    onComplete.run();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error fetching item name for " + booking.getItemId(), e);
-                    booking.setItemName("Error Loading Name");
-                    onComplete.run();
-                });
+        // Fetch service names
+        if (booking.getServices() != null) {
+            for (NewBooking.ServiceBooking service : booking.getServices()) {
+                db.collection("services")
+                        .document(service.getServiceId())
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String serviceName = documentSnapshot.getString("name");
+                                if (serviceName != null && !serviceName.isEmpty()) {
+                                    service.setServiceName(serviceName);
+                                }
+                            }
+                            
+                            if (pendingRequests.decrementAndGet() == 0) {
+                                onComplete.run();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Error fetching service name for " + service.getServiceId(), e);
+                            if (pendingRequests.decrementAndGet() == 0) {
+                                onComplete.run();
+                            }
+                        });
+            }
+        }
     }
     
-        private void sortBookingsByDate() {
+    private void sortBookingsByDate() {
         // Sort bookings by creation date (newest first)
-        Collections.sort(allBookings, new Comparator<Booking>() {
+        Collections.sort(allBookings, new Comparator<NewBooking>() {
             @Override
-            public int compare(Booking booking1, Booking booking2) {
+            public int compare(NewBooking booking1, NewBooking booking2) {
                 Date date1 = booking1.getCreatedAtAsDate();
                 Date date2 = booking2.getCreatedAtAsDate();
 
@@ -427,17 +466,19 @@ public class BookingsFragment extends Fragment implements BookingAdapter.OnBooki
     }
     
     @Override
-    public void onBookingClick(Booking booking) {
+    public void onBookingClick(NewBooking booking) {
         // Handle booking item click
         Toast.makeText(getContext(), "Clicked booking: " + booking.getBookingId(), Toast.LENGTH_SHORT).show();
         // You can navigate to booking details here
     }
     
     @Override
-    public void onViewDetailsClick(Booking booking) {
-        // Handle view details button click
-        Toast.makeText(getContext(), "View details for: " + booking.getBookingId(), Toast.LENGTH_SHORT).show();
-        // You can navigate to booking details here
+    public void onViewDetailsClick(NewBooking booking) {
+        // Navigate to booking details fragment
+        androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
+        Bundle args = new Bundle();
+        args.putString("booking_id", booking.getBookingId());
+        nav.navigate(R.id.action_bookingsFragment_to_bookingDetailsFragment, args);
     }
 }
 

@@ -6,7 +6,7 @@ import java.util.Date;
 public class Booking {
     private String bookingId;
     private String userId;
-    private String type; // "room" or "service"
+    private String type; // "room" or "package"
     private String itemId;
     private Timestamp startDate;
     private Timestamp endDate;
@@ -36,6 +36,15 @@ public class Booking {
         this.currency = currency;
         this.createdAt = createdAt;
     }
+
+    // Optional: list of services for package bookings
+    private java.util.List<String> serviceIds;
+    private java.util.Map<String, Integer> serviceQuantities; // dateKey -> count per service, can be extended as needed
+
+    public java.util.List<String> getServiceIds() { return serviceIds; }
+    public void setServiceIds(java.util.List<String> serviceIds) { this.serviceIds = serviceIds; }
+    public java.util.Map<String, Integer> getServiceQuantities() { return serviceQuantities; }
+    public void setServiceQuantities(java.util.Map<String, Integer> serviceQuantities) { this.serviceQuantities = serviceQuantities; }
     
     // Getters and Setters
     public String getBookingId() {

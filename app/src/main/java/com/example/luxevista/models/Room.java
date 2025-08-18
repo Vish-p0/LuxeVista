@@ -20,6 +20,12 @@ public class Room {
     private int maxGuests;
     private boolean visible;
 
+    // Availability
+    private int totalRooms;
+    private int availableRooms;
+    private int defaultDailyRooms;
+    private java.util.Map<String, Long> availability; // date (yyyy-MM-dd) -> booked count
+
     // Default constructor required for Firestore
     public Room() {}
 
@@ -80,6 +86,11 @@ public class Room {
         return visible;
     }
 
+    public int getTotalRooms() { return totalRooms; }
+    public int getAvailableRooms() { return availableRooms; }
+    public int getDefaultDailyRooms() { return defaultDailyRooms; }
+    public java.util.Map<String, Long> getAvailability() { return availability; }
+
     // Setters
     public void setRoomId(String roomId) {
         this.roomId = roomId;
@@ -121,6 +132,11 @@ public class Room {
         this.visible = visible;
     }
 
+    public void setTotalRooms(int totalRooms) { this.totalRooms = totalRooms; }
+    public void setAvailableRooms(int availableRooms) { this.availableRooms = availableRooms; }
+    public void setDefaultDailyRooms(int defaultDailyRooms) { this.defaultDailyRooms = defaultDailyRooms; }
+    public void setAvailability(java.util.Map<String, Long> availability) { this.availability = availability; }
+
     // Helper methods
     @Exclude
     public String getFormattedPrice() {
@@ -148,6 +164,18 @@ public class Room {
             }
         }
         return count;
+    }
+
+    @Exclude
+    public int getRemainingForDate(String dateKey) {
+        int dailyCapacity = defaultDailyRooms;
+        if (dailyCapacity <= 0) return 0;
+        long booked = 0L;
+        if (availability != null && availability.containsKey(dateKey) && availability.get(dateKey) != null) {
+            booked = availability.get(dateKey);
+        }
+        long remaining = (long) dailyCapacity - booked;
+        return (int) Math.max(0L, remaining);
     }
 
     @Exclude

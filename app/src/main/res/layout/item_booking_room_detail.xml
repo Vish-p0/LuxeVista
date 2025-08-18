@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_section_border"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp"
+    android:gravity="center_vertical">
+
+    <!-- Room Image -->
+    <ImageView
+        android:id="@+id/ivRoomImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_rooms"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_logo_circle_small"
+        android:padding="16dp"
+        android:tint="@color/dark_blue_primary"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Room image" />
+
+    <!-- Room Details -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvRoomName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Deluxe Room"
+            android:textSize="18sp"
+            android:textColor="@color/dark_blue_primary"
+            android:fontFamily="@font/poppins_bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvRoomDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quantity: 1 × 3 nights"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="@font/poppins_regular"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Room Type"
+            android:textSize="12sp"
+            android:textColor="@color/light_blue_primary"
+            android:fontFamily="@font/poppins_medium"
+            android:background="@drawable/bg_availability_badge"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp" />
+
+    </LinearLayout>
+
+    <!-- Room Price -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Subtotal"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="end" />
+
+        <TextView
+            android:id="@+id/tvRoomPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$540.00"
+            android:textSize="20sp"
+            android:textColor="@color/light_blue_primary"
+            android:fontFamily="@font/poppins_bold"
+            android:gravity="end" />
+
+    </LinearLayout>
+
+</LinearLayout>

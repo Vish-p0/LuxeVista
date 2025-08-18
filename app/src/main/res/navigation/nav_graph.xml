@@ -22,7 +22,11 @@
     <fragment
         android:id="@+id/bookingsFragment"
         android:name="com.example.luxevista.BookingsFragment"
-        android:label="Bookings" />
+        android:label="Bookings">
+        <action
+            android:id="@+id/action_bookingsFragment_to_bookingDetailsFragment"
+            app:destination="@id/bookingDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
@@ -43,6 +47,33 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.luxevista.SettingsFragment"
         android:label="Settings" />
+
+    <fragment
+        android:id="@+id/bookingFlowFragment"
+        android:name="com.example.luxevista.BookingFlowFragment"
+        android:label="Booking">
+        <action
+            android:id="@+id/action_bookingFlow_to_confirmation"
+            app:destination="@id/bookingConfirmationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookingConfirmationFragment"
+        android:name="com.example.luxevista.BookingConfirmationFragment"
+        android:label="Confirm">
+        <action
+            android:id="@+id/action_bookingConfirmation_to_bookingsFragment"
+            app:destination="@id/bookingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookingDetailsFragment"
+        android:name="com.example.luxevista.BookingDetailsFragment"
+        android:label="Booking Details">
+        <argument
+            android:name="booking_id"
+            app:argType="string" />
+    </fragment>
 
 </navigation>
 
