@@ -63,7 +63,7 @@ public class NewBookingAdapter extends RecyclerView.Adapter<NewBookingAdapter.Bo
         
         for (NewBooking booking : bookings) {
             boolean matchesQuery = query.isEmpty() || 
-                    booking.getBookingId().toLowerCase().contains(query.toLowerCase()) ||
+                    booking.getDisplayName().toLowerCase().contains(query.toLowerCase()) ||
                     booking.getSummaryText().toLowerCase().contains(query.toLowerCase());
             
             boolean matchesFilter = filterType.equals("All") ||
@@ -81,7 +81,7 @@ public class NewBookingAdapter extends RecyclerView.Adapter<NewBookingAdapter.Bo
     
     static class BookingViewHolder extends RecyclerView.ViewHolder {
         private final ImageView iconType;
-        private final TextView textBookingId;
+        private final TextView textRoomName;
         private final TextView textSummary;
         private final TextView textStatus;
         private final TextView textDates;
@@ -95,7 +95,7 @@ public class NewBookingAdapter extends RecyclerView.Adapter<NewBookingAdapter.Bo
         public BookingViewHolder(@NonNull View itemView) {
             super(itemView);
             iconType = itemView.findViewById(R.id.iconType);
-            textBookingId = itemView.findViewById(R.id.textBookingId);
+            textRoomName = itemView.findViewById(R.id.textRoomName);
             textSummary = itemView.findViewById(R.id.textSummary);
             textStatus = itemView.findViewById(R.id.textStatus);
             textDates = itemView.findViewById(R.id.textDates);
@@ -104,8 +104,8 @@ public class NewBookingAdapter extends RecyclerView.Adapter<NewBookingAdapter.Bo
         }
         
         public void bind(NewBooking booking, OnBookingClickListener listener) {
-            // Set booking ID
-            textBookingId.setText("Booking #" + booking.getBookingId());
+            // Set display name (room names instead of booking ID)
+            textRoomName.setText(booking.getDisplayName());
             
             // Set summary text (rooms + services count)
             textSummary.setText(booking.getSummaryText());

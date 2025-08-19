@@ -35,10 +35,10 @@
             android:layout_marginStart="16dp">
 
             <TextView
-                android:id="@+id/textBookingId"
+                android:id="@+id/textRoomName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Booking #123"
+                android:text="Deluxe Ocean View Suite"
                 android:textSize="18sp"
                 android:textColor="@color/dark_blue_primary"
                 android:fontFamily="@font/poppins_bold"

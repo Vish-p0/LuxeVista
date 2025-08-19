@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,11 +57,20 @@ public class BookingFlowFragment extends Fragment {
 
     private Date checkInDate;
     private Date checkOutDate;
-    private Room selectedRoom;
 
     private final SimpleDateFormat apiDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-    @Nullable
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        // Now that the view is created, check for pre-filled data
+        // Use a small delay to ensure everything is properly initialized
+        view.post(() -> {
+            checkForPrefilledData();
+        });
+    }
+    
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_booking_flow, container, false);
@@ -71,12 +81,64 @@ public class BookingFlowFragment extends Fragment {
         initViews(view);
         setupRecyclerViews();
         setupClickListeners();
-
-        // Initially show placeholders, hide lists and selected items
+        
+        // Don't check for pre-filled data here, wait for onViewCreated
+        // Only show placeholders initially
         togglePlaceholders(true);
+        
         updateSelectedItemsSection();
 
         return view;
+    }
+    
+    private void checkForPrefilledData() {
+        BookingCart cart = BookingCart.getInstance();
+        Log.d("BookingFlow", "Checking for pre-filled data. Cart has dates: " + (cart.checkIn != null && cart.checkOut != null));
+        Log.d("BookingFlow", "Cart has rooms: " + cart.roomSelections.size() + ", services: " + cart.serviceSelections.size());
+        
+        // Check if we have pre-filled dates
+        if (cart.checkIn != null && cart.checkOut != null) {
+            checkInDate = cart.checkIn.toDate();
+            checkOutDate = cart.checkOut.toDate();
+            Log.d("BookingFlow", "Setting pre-filled dates: " + checkInDate + " to " + checkOutDate);
+            
+            // Update date display
+            tvCheckIn.setText("Check-in: " + DateFormat.format("MMM d, yyyy 2:00 PM", checkInDate));
+            tvCheckOut.setText("Check-out: " + DateFormat.format("MMM d, yyyy 11:00 AM", checkOutDate));
+            
+            // Use post to ensure view is fully initialized before toggling placeholders
+            getView().post(() -> {
+                // Immediately hide placeholders and show lists for the selected dates
+                togglePlaceholders(false);
+                
+                // Reload lists for the selected dates
+                reloadListsForDates();
+            });
+        }
+        
+        // Check if we have pre-filled items
+        if (!cart.roomSelections.isEmpty() || !cart.serviceSelections.isEmpty()) {
+            Log.d("BookingFlow", "Updating selected items section for pre-filled items");
+            // Update the selected items section
+            updateSelectedItemsSection();
+            
+            // Update adapters to show selected items
+            updateAdaptersForPrefilledItems();
+        }
+    }
+    
+    private void updateAdaptersForPrefilledItems() {
+        BookingCart cart = BookingCart.getInstance();
+        
+        // Update room adapter selections
+        for (String roomId : cart.roomSelections.keySet()) {
+            roomsAdapter.setSelectedRoom(roomId);
+        }
+        
+        // Update service adapter selections
+        for (BookingCart.ServiceSelection serviceSel : cart.serviceSelections) {
+            servicesAdapter.setSelectedService(serviceSel.serviceId);
+        }
     }
 
     private void initViews(View view) {
@@ -199,6 +261,8 @@ public class BookingFlowFragment extends Fragment {
 
     private void reloadListsForDates() {
         List<String> nights = getNightsInclusive();
+        Log.d("BookingFlow", "Reloading lists for " + nights.size() + " nights: " + nights);
+        
         roomsAdapter.setNightsKeys(nights);
         servicesAdapter.setNightsKeys(nights);
         togglePlaceholders(false);
@@ -212,6 +276,7 @@ public class BookingFlowFragment extends Fragment {
                 for (String d : nights) { if (r.getRemainingForDate(d) <= 0) { ok = false; break; } }
                 if (ok) list.add(r);
             }
+            Log.d("BookingFlow", "Found " + list.size() + " available rooms for selected dates");
             roomsAdapter.setRooms(list);
         });
 
@@ -224,23 +289,46 @@ public class BookingFlowFragment extends Fragment {
                 for (String d : nights) { if (s.getRemainingForDate(d) <= 0) { ok = false; break; } }
                 if (ok) list.add(s);
             }
+            Log.d("BookingFlow", "Found " + list.size() + " available services for selected dates");
             servicesAdapter.setServices(list);
         });
     }
 
     private void togglePlaceholders(boolean showPlaceholders) {
         View root = getView();
-        if (root == null) return;
+        if (root == null) {
+            Log.w("BookingFlow", "View is null in togglePlaceholders, cannot update visibility");
+            return;
+        }
+        
         TextView phRooms = root.findViewById(R.id.placeholderRooms);
         TextView phServices = root.findViewById(R.id.placeholderServices);
         RecyclerView rvRooms = root.findViewById(R.id.recyclerRooms);
         RecyclerView rvServices = root.findViewById(R.id.recyclerServices);
+        
+        Log.d("BookingFlow", "Toggling placeholders. Show: " + showPlaceholders);
+        Log.d("BookingFlow", "phRooms: " + (phRooms != null) + ", phServices: " + (phServices != null));
+        Log.d("BookingFlow", "rvRooms: " + (rvRooms != null) + ", rvServices: " + (rvServices != null));
+        
         int phVis = showPlaceholders ? View.VISIBLE : View.GONE;
         int listVis = showPlaceholders ? View.GONE : View.VISIBLE;
-        if (phRooms != null) phRooms.setVisibility(phVis);
-        if (phServices != null) phServices.setVisibility(phVis);
-        if (rvRooms != null) rvRooms.setVisibility(listVis);
-        if (rvServices != null) rvServices.setVisibility(listVis);
+        
+        if (phRooms != null) {
+            phRooms.setVisibility(phVis);
+            Log.d("BookingFlow", "Set phRooms visibility to: " + (showPlaceholders ? "VISIBLE" : "GONE"));
+        }
+        if (phServices != null) {
+            phServices.setVisibility(phVis);
+            Log.d("BookingFlow", "Set phServices visibility to: " + (showPlaceholders ? "VISIBLE" : "GONE"));
+        }
+        if (rvRooms != null) {
+            rvRooms.setVisibility(listVis);
+            Log.d("BookingFlow", "Set rvRooms visibility to: " + (showPlaceholders ? "GONE" : "VISIBLE"));
+        }
+        if (rvServices != null) {
+            rvServices.setVisibility(listVis);
+            Log.d("BookingFlow", "Set rvServices visibility to: " + (showPlaceholders ? "GONE" : "VISIBLE"));
+        }
     }
 
     private void showRoomDetailsDialog(Room room, int maxQty) {
@@ -281,7 +369,6 @@ public class BookingFlowFragment extends Fragment {
         content.findViewById(R.id.btnApply).setOnClickListener(v -> {
             int qty = (Integer) spnQty.getSelectedItem();
             if (qty > 0) {
-                selectedRoom = room;
                 BookingCart.getInstance().roomSelections.put(room.getRoomId(), new BookingCart.RoomSelection(
                         room.getRoomId(), room.getName(), room.getPricePerNight(), qty
                 ));
@@ -332,9 +419,21 @@ public class BookingFlowFragment extends Fragment {
         if (qtyOptions.isEmpty()) qtyOptions.add(0);
         spnQty.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, qtyOptions));
         
-        List<String> timeSlots = new ArrayList<>();
-        for (int h = 9; h <= 20; h++) timeSlots.add(String.format(Locale.US, "%02d:00", h));
-        spnTime.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, timeSlots));
+        // Get available time slots for the selected date
+        List<String> availableTimeSlots = new ArrayList<>();
+        if (checkInDate != null) {
+            String dateKey = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(checkInDate);
+            availableTimeSlots = service.getAvailableTimesForDate(dateKey);
+        }
+        
+        // If no specific time slots available, use default hours
+        if (availableTimeSlots.isEmpty()) {
+            for (int h = 9; h <= 20; h++) {
+                availableTimeSlots.add(String.format(Locale.US, "%02d:00", h));
+            }
+        }
+        
+        spnTime.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, availableTimeSlots));
         
         // Setup apply button
         content.findViewById(R.id.btnApply).setOnClickListener(v -> {
@@ -458,25 +557,26 @@ public class BookingFlowFragment extends Fragment {
     }
 
     private View createRoomItemView(BookingCart.RoomSelection roomSel) {
-        View itemView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_2, null);
-        TextView text1 = itemView.findViewById(android.R.id.text1);
-        TextView text2 = itemView.findViewById(android.R.id.text2);
+        View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_selected_item, null);
+        
+        // Set room icon with proper tint
+        ImageView ivItemIcon = itemView.findViewById(R.id.ivItemIcon);
+        ivItemIcon.setImageResource(R.drawable.ic_rooms);
+        ivItemIcon.setColorFilter(getResources().getColor(R.color.dark_blue_primary, null));
+        
+        // Set item name and details
+        TextView tvItemName = itemView.findViewById(R.id.tvItemName);
+        TextView tvItemPrice = itemView.findViewById(R.id.tvItemPrice);
         
         int nights = getNumberOfNights();
         double subtotal = roomSel.quantity * roomSel.pricePerNight * nights;
         
-        text1.setText(roomSel.name + " × " + roomSel.quantity + " (" + nights + " nights)");
-        text2.setText(String.format(Locale.US, "$%.2f", subtotal));
+        tvItemName.setText(roomSel.name + " × " + roomSel.quantity + " (" + nights + " nights)");
+        tvItemPrice.setText(String.format(Locale.US, "$%.2f", subtotal));
         
-        // Add remove button
-        Button removeBtn = new Button(getContext());
-        removeBtn.setText("Remove");
-        removeBtn.setTextSize(12);
-        removeBtn.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT, 
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        removeBtn.setOnClickListener(v -> {
+        // Setup remove button
+        Button btnRemove = itemView.findViewById(R.id.btnRemove);
+        btnRemove.setOnClickListener(v -> {
             BookingCart.getInstance().roomSelections.remove(roomSel.roomId);
             // Clear the room selection in the adapter
             roomsAdapter.clearSelection();
@@ -484,38 +584,30 @@ public class BookingFlowFragment extends Fragment {
             Snackbar.make(requireView(), "Removed " + roomSel.name, Snackbar.LENGTH_SHORT).show();
         });
         
-        LinearLayout container = new LinearLayout(getContext());
-        container.setOrientation(LinearLayout.HORIZONTAL);
-        container.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        container.addView(itemView, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        container.addView(removeBtn);
-        
-        return container;
+        return itemView;
     }
 
     private View createServiceItemView(BookingCart.ServiceSelection serviceSel) {
-        View itemView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_2, null);
-        TextView text1 = itemView.findViewById(android.R.id.text1);
-        TextView text2 = itemView.findViewById(android.R.id.text2);
+        View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_selected_item, null);
+        
+        // Set service icon with proper tint
+        ImageView ivItemIcon = itemView.findViewById(R.id.ivItemIcon);
+        ivItemIcon.setImageResource(R.drawable.ic_services);
+        ivItemIcon.setColorFilter(getResources().getColor(R.color.dark_blue_primary, null));
+        
+        // Set item name and details
+        TextView tvItemName = itemView.findViewById(R.id.tvItemName);
+        TextView tvItemPrice = itemView.findViewById(R.id.tvItemPrice);
         
         double subtotal = serviceSel.quantity * serviceSel.price;
         String timeStr = DateFormat.format("MMM d, h:mm a", serviceSel.scheduledAt.toDate()).toString();
         
-        text1.setText(serviceSel.name + " × " + serviceSel.quantity + " @ " + timeStr);
-        text2.setText(String.format(Locale.US, "$%.2f", subtotal));
+        tvItemName.setText(serviceSel.name + " × " + serviceSel.quantity + " @ " + timeStr);
+        tvItemPrice.setText(String.format(Locale.US, "$%.2f", subtotal));
         
-        // Add remove button
-        Button removeBtn = new Button(getContext());
-        removeBtn.setText("Remove");
-        removeBtn.setTextSize(12);
-        removeBtn.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT, 
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        removeBtn.setOnClickListener(v -> {
+        // Setup remove button
+        Button btnRemove = itemView.findViewById(R.id.btnRemove);
+        btnRemove.setOnClickListener(v -> {
             BookingCart.getInstance().serviceSelections.remove(serviceSel);
             // Clear the service selection in the adapter
             servicesAdapter.clearSelection();
@@ -523,16 +615,7 @@ public class BookingFlowFragment extends Fragment {
             Snackbar.make(requireView(), "Removed " + serviceSel.name, Snackbar.LENGTH_SHORT).show();
         });
         
-        LinearLayout container = new LinearLayout(getContext());
-        container.setOrientation(LinearLayout.HORIZONTAL);
-        container.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        container.addView(itemView, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        container.addView(removeBtn);
-        
-        return container;
+        return itemView;
     }
 
     private void updateEstimatedTotal() {
@@ -570,18 +653,20 @@ public class BookingFlowFragment extends Fragment {
             Snackbar.make(requireView(), "Select dates first", Snackbar.LENGTH_LONG).show();
             return;
         }
-        if (BookingCart.getInstance().roomSelections.isEmpty() && selectedRoom == null) {
-            Snackbar.make(requireView(), "Please select a room", Snackbar.LENGTH_LONG).show();
-            return;
-        }
+        
         BookingCart cart = BookingCart.getInstance();
+        
+        // Update cart with current dates if they've changed
         cart.checkIn = new Timestamp(checkInDate);
         cart.checkOut = new Timestamp(checkOutDate);
-        if (selectedRoom != null && !cart.roomSelections.containsKey(selectedRoom.getRoomId())) {
-            cart.roomSelections.put(selectedRoom.getRoomId(), new BookingCart.RoomSelection(
-                    selectedRoom.getRoomId(), selectedRoom.getName(), selectedRoom.getPricePerNight(), 1
-            ));
+        
+        // Check if we have any selections
+        if (cart.roomSelections.isEmpty() && cart.serviceSelections.isEmpty()) {
+            Snackbar.make(requireView(), "Please select at least one room or service", Snackbar.LENGTH_LONG).show();
+            return;
         }
+        
+        // Navigate to confirmation
         androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
         nav.navigate(R.id.action_bookingFlow_to_confirmation);
     }

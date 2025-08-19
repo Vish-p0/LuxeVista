@@ -270,16 +270,14 @@ public class BookingConfirmationFragment extends Fragment {
             holder.tvItemDate.setText(item.dateTime);
             holder.tvItemPrice.setText(String.format(Locale.US, "$%.2f", item.price));
 
-            // Load image if available
+            // Load image if available, otherwise use type-specific placeholder with tint
             if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
                 ImageUtils.loadImageWithFallback(holder.ivItemImage, item.imageUrl);
             } else {
-                // Set default image based on type
-                if ("room".equals(item.type)) {
-                    holder.ivItemImage.setImageResource(R.drawable.ic_rooms);
-                } else {
-                    holder.ivItemImage.setImageResource(R.drawable.ic_services);
-                }
+                // Use the specialized method that handles room/service placeholders
+                ImageUtils.loadItemImageWithFallback(holder.ivItemImage, null, item.type);
+                // Apply tint to the placeholder icons
+                holder.ivItemImage.setColorFilter(holder.itemView.getContext().getResources().getColor(R.color.dark_blue_primary, null));
             }
         }
 

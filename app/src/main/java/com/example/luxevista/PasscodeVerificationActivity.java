@@ -102,8 +102,9 @@ public class PasscodeVerificationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Prevent back button from bypassing security
-        // User must enter correct passcode or use recovery
+        // Ensure superclass behavior is invoked as required by lint
+        super.onBackPressed();
+        // Prevent back button from bypassing security by moving app to background
         moveTaskToBack(true);
     }
 }

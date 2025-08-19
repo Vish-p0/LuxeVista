@@ -162,6 +162,44 @@ public class NewBooking {
         return summary.toString();
     }
     
+    // Get display name for the booking (room names instead of booking ID)
+    public String getDisplayName() {
+        if (rooms != null && !rooms.isEmpty()) {
+            if (rooms.size() == 1) {
+                // Single room - show room name
+                String roomName = rooms.get(0).getRoomName();
+                if (roomName != null && !roomName.isEmpty()) {
+                    return roomName;
+                } else {
+                    return "Room";
+                }
+            } else {
+                // Multiple rooms - show first room name + "& more"
+                String firstRoomName = rooms.get(0).getRoomName();
+                if (firstRoomName != null && !firstRoomName.isEmpty()) {
+                    return firstRoomName + " & more";
+                } else {
+                    return "Multiple rooms";
+                }
+            }
+        } else if (services != null && !services.isEmpty()) {
+            // Only services - show first service name
+            String serviceName = services.get(0).getServiceName();
+            if (serviceName != null && !serviceName.isEmpty()) {
+                if (services.size() == 1) {
+                    return serviceName;
+                } else {
+                    return serviceName + " & more";
+                }
+            } else {
+                return "Services";
+            }
+        }
+        
+        // Fallback
+        return "Booking";
+    }
+    
     // Inner class for room bookings
     public static class RoomBooking {
         private String roomId;

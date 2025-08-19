@@ -468,7 +468,7 @@ public class BookingsFragment extends Fragment implements NewBookingAdapter.OnBo
     @Override
     public void onBookingClick(NewBooking booking) {
         // Handle booking item click
-        Toast.makeText(getContext(), "Clicked booking: " + booking.getBookingId(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Clicked: " + booking.getDisplayName(), Toast.LENGTH_SHORT).show();
         // You can navigate to booking details here
     }
     

@@ -50,6 +50,7 @@
         <activity android:name=".SettingsPlaceholderActivity" android:exported="false" />
         <activity android:name=".RoomDetailsActivity" android:exported="false" />
         <activity android:name=".ServiceDetailsActivity" android:exported="false" />
+        <activity android:name=".ServiceBookingActivity" android:exported="false" />
         <activity android:name=".AttractionDetailsActivity" android:exported="false" />
         <activity android:name=".TestimonialsActivity" android:exported="false" />
     </application>

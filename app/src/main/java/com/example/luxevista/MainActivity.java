@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
                     case "profile":
                         navController.navigate(R.id.profileFragment);
                         break;
+                    case "booking":
+                        navController.navigate(R.id.bookingFlowFragment);
+                        break;
                 }
             }
         }

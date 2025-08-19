@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,13 +22,23 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
     private List<Service> services = new ArrayList<>();
     private List<Service> filteredServices = new ArrayList<>();
     private OnServiceClickListener listener;
+    private OnBookNowClickListener bookNowListener;
 
     public interface OnServiceClickListener {
         void onServiceClick(Service service);
     }
 
+    public interface OnBookNowClickListener {
+        void onBookNowClick(Service service);
+    }
+
     public ServiceAdapter(OnServiceClickListener listener) {
         this.listener = listener;
+    }
+
+    public ServiceAdapter(OnServiceClickListener listener, OnBookNowClickListener bookNowListener) {
+        this.listener = listener;
+        this.bookNowListener = bookNowListener;
     }
 
     @NonNull
@@ -41,7 +52,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
     @Override
     public void onBindViewHolder(@NonNull ServiceViewHolder holder, int position) {
         Service service = filteredServices.get(position);
-        holder.bind(service, listener);
+        holder.bind(service, listener, bookNowListener);
     }
 
     @Override
@@ -80,6 +91,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
         private final TextView tvServiceName;
         private final TextView tvServiceDuration;
         private final TextView tvServiceDescription;
+        private final Button btnBookNow;
 
         public ServiceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -89,9 +101,10 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
             tvServiceName = itemView.findViewById(R.id.tvServiceName);
             tvServiceDuration = itemView.findViewById(R.id.tvServiceDuration);
             tvServiceDescription = itemView.findViewById(R.id.tvServiceDescription);
+            btnBookNow = itemView.findViewById(R.id.btnBookNow);
         }
 
-        public void bind(Service service, OnServiceClickListener listener) {
+        public void bind(Service service, OnServiceClickListener listener, OnBookNowClickListener bookNowListener) {
             // Set service image with fallback
             ImageUtils.loadImageWithFallback(ivServiceImage, service.getFirstImageUrl());
 
@@ -102,7 +115,17 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
             tvServiceDuration.setText(service.getFormattedDuration());
             tvServiceDescription.setText(service.getDescription() != null ? service.getDescription() : "");
 
-            // Set click listener
+            // Setup Book Now button
+            if (btnBookNow != null) {
+                btnBookNow.setVisibility(View.VISIBLE);
+                btnBookNow.setOnClickListener(v -> {
+                    if (bookNowListener != null) {
+                        bookNowListener.onBookNowClick(service);
+                    }
+                });
+            }
+
+            // Set click listener for the entire card
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onServiceClick(service);

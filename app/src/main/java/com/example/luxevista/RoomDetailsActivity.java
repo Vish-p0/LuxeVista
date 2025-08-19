@@ -259,11 +259,75 @@ public class RoomDetailsActivity extends AppCompatActivity {
     }
 
     private void setupBookingButton() {
+        btnBookNow.setText("Continue Booking");
         btnBookNow.setOnClickListener(v -> {
             if (validateBookingDates()) {
-                createBooking();
+                // Pre-fill the booking cart and redirect to main booking flow
+                prefillBookingCartAndRedirect();
             }
         });
+    }
+    
+    private void prefillBookingCartAndRedirect() {
+        // Calculate total price for display
+        long diffInMillis = checkOutCalendar.getTimeInMillis() - checkInCalendar.getTimeInMillis();
+        long nights = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        double totalPrice = nights * pricePerNight;
+        
+        // Pre-fill the booking cart
+        BookingCart cart = BookingCart.getInstance();
+        cart.clear(); // Clear any existing selections
+        cart.checkIn = new Timestamp(checkInCalendar.getTime());
+        cart.checkOut = new Timestamp(checkOutCalendar.getTime());
+        cart.currency = currency != null ? currency : "USD";
+        
+        // Add the selected room
+        cart.roomSelections.put(roomId, new BookingCart.RoomSelection(
+            roomId, roomName, pricePerNight, 1
+        ));
+        
+        // Show confirmation and redirect
+        showRedirectDialog(totalPrice, nights);
+    }
+    
+    private void showRedirectDialog(double totalPrice, long nights) {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+        String message = "Room added to booking cart:\n\n" +
+                "Room: " + roomName + "\n" +
+                "Check-in: " + dateFormat.format(checkInCalendar.getTime()) + "\n" +
+                "Check-out: " + dateFormat.format(checkOutCalendar.getTime()) + "\n" +
+                "Nights: " + nights + "\n" +
+                "Price: " + currencyFormat.format(totalPrice) + "\n\n" +
+                "You can add more rooms or services in the main booking flow.";
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Continue to Booking")
+                .setMessage(message)
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    // Navigate to main booking flow
+                    redirectToMainBookingFlow();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    
+    private void redirectToMainBookingFlow() {
+        try {
+            // Navigate to the main booking flow
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("fragment", "booking");
+            intent.putExtra("prefilled", true);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e(TAG, "Error navigating to booking flow", e);
+            // Fallback: show toast and navigate to main activity
+            Toast.makeText(this, "Redirecting to booking...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("fragment", "booking");
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void displayRoomInfo() {
@@ -417,112 +481,6 @@ public class RoomDetailsActivity extends AppCompatActivity {
         }
         
         return true;
-    }
-
-    private void createBooking() {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(this, "Please log in to make a booking", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Show loading
-        btnBookNow.setEnabled(false);
-        btnBookNow.setText("Creating Booking...");
-
-        // Generate booking ID
-        generateBookingId((bookingId) -> {
-            // Calculate total price
-            long diffInMillis = checkOutCalendar.getTimeInMillis() - checkInCalendar.getTimeInMillis();
-            long nights = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-            double totalPrice = nights * pricePerNight;
-
-            // Create booking document
-            Map<String, Object> booking = new HashMap<>();
-            booking.put("bookingId", bookingId);
-            booking.put("userId", currentUser.getUid());
-            booking.put("type", "room");
-            booking.put("itemId", roomId);
-            booking.put("startDate", new Timestamp(checkInCalendar.getTime()));
-            booking.put("endDate", new Timestamp(checkOutCalendar.getTime()));
-            booking.put("status", "confirmed");
-            booking.put("price", totalPrice);
-            booking.put("currency", currency != null ? currency : "USD");
-            booking.put("createdAt", Timestamp.now());
-
-            // Save to Firestore
-            db.collection("bookings")
-                    .add(booking)
-                    .addOnSuccessListener(documentReference -> {
-                        btnBookNow.setEnabled(true);
-                        btnBookNow.setText("Book Now");
-                        showBookingSuccessDialog(bookingId, totalPrice, nights);
-                    })
-                    .addOnFailureListener(e -> {
-                        btnBookNow.setEnabled(true);
-                        btnBookNow.setText("Book Now");
-                        Log.e(TAG, "Error creating booking", e);
-                        Toast.makeText(this, "Failed to create booking. Please try again.", Toast.LENGTH_SHORT).show();
-                    });
-        });
-    }
-
-    private void generateBookingId(BookingIdCallback callback) {
-        db.collection("bookings")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(1)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    String newBookingId;
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        // Get the last booking ID and increment
-                        String lastBookingId = queryDocumentSnapshots.getDocuments().get(0).getString("bookingId");
-                        if (lastBookingId != null && lastBookingId.startsWith("booking")) {
-                            try {
-                                int lastNumber = Integer.parseInt(lastBookingId.substring(7));
-                                newBookingId = String.format("booking%03d", lastNumber + 1);
-                            } catch (NumberFormatException e) {
-                                newBookingId = "booking001";
-                            }
-                        } else {
-                            newBookingId = "booking001";
-                        }
-                    } else {
-                        newBookingId = "booking001";
-                    }
-                    callback.onBookingIdGenerated(newBookingId);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error generating booking ID", e);
-                    // Fallback to timestamp-based ID
-                    String fallbackId = "booking" + System.currentTimeMillis();
-                    callback.onBookingIdGenerated(fallbackId);
-                });
-    }
-
-    private void showBookingSuccessDialog(String bookingId, double totalPrice, long nights) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
-        String message = "Booking Confirmation\n\n" +
-                "Booking ID: " + bookingId + "\n" +
-                "Room: " + roomName + "\n" +
-                "Check-in: " + dateFormat.format(checkInCalendar.getTime()) + "\n" +
-                "Check-out: " + dateFormat.format(checkOutCalendar.getTime()) + "\n" +
-                "Nights: " + nights + "\n" +
-                "Total: " + currencyFormat.format(totalPrice);
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Booking Successful!")
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Navigate back or to bookings page
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
-    }
-
-    interface BookingIdCallback {
-        void onBookingIdGenerated(String bookingId);
     }
 
     public static class AmenityItem {
