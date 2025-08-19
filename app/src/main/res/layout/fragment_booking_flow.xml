@@ -137,6 +137,43 @@
                     android:visibility="gone" />
             </LinearLayout>
 
+            <!-- Service Date Selection Section (after rooms) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_section_border"
+                android:padding="16dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Service Date (optional)"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/poppins_bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvSelectedServiceDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Service date: Not selected"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnSelectServiceDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Select Service Date"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/dark_blue_primary" />
+            </LinearLayout>
+
             <!-- Services Section -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -291,5 +328,3 @@
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
-
-

@@ -81,8 +81,8 @@ public class BookingServicesAdapter extends RecyclerView.Adapter<BookingServices
     }
 
     class ServiceViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivServiceImage;
-        private TextView tvServiceName, tvPrice, tvDuration, tvAvailable, tvAddedQuantity;
+    private ImageView ivServiceImage;
+    private TextView tvServiceName, tvPrice, tvDuration, tvAvailable, tvAddedQuantity, tvCategory, tvDescription;
 
         public ServiceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,6 +92,8 @@ public class BookingServicesAdapter extends RecyclerView.Adapter<BookingServices
             tvDuration = itemView.findViewById(R.id.tvDuration);
             tvAvailable = itemView.findViewById(R.id.tvAvailable);
             tvAddedQuantity = itemView.findViewById(R.id.tvAddedQuantity);
+            tvCategory = itemView.findViewById(R.id.tvCategory);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -114,15 +116,16 @@ public class BookingServicesAdapter extends RecyclerView.Adapter<BookingServices
             tvServiceName.setText(service.getName());
             tvPrice.setText(String.format("$%.2f", service.getPrice()));
             tvDuration.setText(service.getFormattedDuration());
+            if (tvCategory != null) tvCategory.setText(service.getCategory() != null ? service.getCategory() : "");
+            if (tvDescription != null) tvDescription.setText(service.getDescription() != null ? service.getDescription() : "");
 
-            // Calculate and show availability
-            int minAvailable = Integer.MAX_VALUE;
+            // Calculate and show availability: any-day max helps users see potential slots
+            int anyDayMax = 0;
             for (String date : nightsKeys) {
                 int available = service.getRemainingForDate(date);
-                minAvailable = Math.min(minAvailable, available);
+                anyDayMax = Math.max(anyDayMax, available);
             }
-            if (minAvailable == Integer.MAX_VALUE) minAvailable = 0;
-            tvAvailable.setText(minAvailable + " slots");
+            tvAvailable.setText(anyDayMax + " slots");
 
             // Show added quantity if any
             int addedQty = BookingCart.getInstance().getServiceQuantity(service.getServiceId());

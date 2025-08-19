@@ -22,7 +22,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
     private List<Service> services = new ArrayList<>();
     private List<Service> filteredServices = new ArrayList<>();
     private OnServiceClickListener listener;
-    private OnBookNowClickListener bookNowListener;
+    private OnBookNowClickListener bookNowListener; // deprecated; view-only
 
     public interface OnServiceClickListener {
         void onServiceClick(Service service);
@@ -38,7 +38,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
 
     public ServiceAdapter(OnServiceClickListener listener, OnBookNowClickListener bookNowListener) {
         this.listener = listener;
-        this.bookNowListener = bookNowListener;
+        this.bookNowListener = null; // ignore Book Now in view-only mode
     }
 
     @NonNull
@@ -91,7 +91,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
         private final TextView tvServiceName;
         private final TextView tvServiceDuration;
         private final TextView tvServiceDescription;
-        private final Button btnBookNow;
+    private final Button btnBookNow;
 
         public ServiceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -115,14 +115,10 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceV
             tvServiceDuration.setText(service.getFormattedDuration());
             tvServiceDescription.setText(service.getDescription() != null ? service.getDescription() : "");
 
-            // Setup Book Now button
+            // View-only: hide Book Now if present
             if (btnBookNow != null) {
-                btnBookNow.setVisibility(View.VISIBLE);
-                btnBookNow.setOnClickListener(v -> {
-                    if (bookNowListener != null) {
-                        bookNowListener.onBookNowClick(service);
-                    }
-                });
+                btnBookNow.setVisibility(View.GONE);
+                btnBookNow.setOnClickListener(null);
             }
 
             // Set click listener for the entire card

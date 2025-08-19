@@ -94,8 +94,13 @@ public class BookingConfirmationFragment extends Fragment {
 
     private void finalizeBooking() {
         BookingCart cart = BookingCart.getInstance();
-        if (cart.checkIn == null || cart.checkOut == null || cart.roomSelections.isEmpty()) {
-            Snackbar.make(requireView(), "Please select dates and at least one room", Snackbar.LENGTH_LONG).show();
+        if (cart.checkIn == null || cart.checkOut == null) {
+            Snackbar.make(requireView(), "Please select dates first", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        // Require at least one room (services alone are not allowed)
+        if (cart.roomSelections.isEmpty()) {
+            Snackbar.make(requireView(), "Please select at least one room", Snackbar.LENGTH_LONG).show();
             return;
         }
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "guest";
@@ -179,7 +184,7 @@ public class BookingConfirmationFragment extends Fragment {
                 trx.set(roomRef, data, SetOptions.merge());
             }
 
-            // WRITE PHASE: Update all service availability
+            // WRITE PHASE: Update all service availability (nested date -> time -> booked count)
             for (BookingCart.ServiceSelection s : cart.serviceSelections) {
                 DocumentReference sRef = db.collection("services").document(s.serviceId);
                 DocumentSnapshot snap = serviceSnapshots.get(s.serviceId);
@@ -187,13 +192,27 @@ public class BookingConfirmationFragment extends Fragment {
                 if (data == null) data = new HashMap<>();
                 Map<String, Object> avail = (Map<String, Object>) data.get("availability");
                 if (avail == null) avail = new HashMap<>();
-                // Use date key yyyy-MM-dd for day; time-slot-level tracking could be nested if needed
-                java.text.SimpleDateFormat api = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                String dayKey = api.format(s.scheduledAt.toDate());
+
+                java.text.SimpleDateFormat apiDay = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                java.text.SimpleDateFormat apiTime = new java.text.SimpleDateFormat("HH:mm", Locale.US);
+                String dayKey = apiDay.format(s.scheduledAt.toDate());
+                String timeKey = apiTime.format(s.scheduledAt.toDate());
+
+                // Get nested map for the day
+                Object dayRaw = avail.get(dayKey);
+                Map<String, Object> timesMap;
+                if (dayRaw instanceof Map) {
+                    timesMap = (Map<String, Object>) dayRaw;
+                } else {
+                    timesMap = new HashMap<>();
+                }
+
                 long booked = 0L;
-                Object raw = avail.get(dayKey);
+                Object raw = timesMap.get(timeKey);
                 if (raw instanceof Number) booked = ((Number) raw).longValue();
-                avail.put(dayKey, booked + s.quantity);
+                timesMap.put(timeKey, booked + s.quantity);
+
+                avail.put(dayKey, timesMap);
                 data.put("availability", avail);
                 trx.set(sRef, data, SetOptions.merge());
             }

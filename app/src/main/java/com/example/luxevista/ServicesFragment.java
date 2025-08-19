@@ -30,7 +30,7 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServicesFragment extends Fragment implements ServiceAdapter.OnServiceClickListener, ServiceAdapter.OnBookNowClickListener {
+public class ServicesFragment extends Fragment implements ServiceAdapter.OnServiceClickListener {
 
     private static final String TAG = "ServicesFragment";
 
@@ -93,7 +93,7 @@ public class ServicesFragment extends Fragment implements ServiceAdapter.OnServi
     }
 
     private void setupRecyclerView() {
-        serviceAdapter = new ServiceAdapter(this, this);
+        serviceAdapter = new ServiceAdapter(this);
         recyclerServices.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerServices.setAdapter(serviceAdapter);
     }
@@ -295,26 +295,7 @@ public class ServicesFragment extends Fragment implements ServiceAdapter.OnServi
         startActivity(intent);
     }
 
-    // Implement OnBookNowClickListener
-    public void onBookNowClick(Service service) {
-        // Navigate to the new booking flow with service pre-selected
-        Intent intent = new Intent(getContext(), ServiceBookingActivity.class);
-        intent.putExtra("serviceId", service.getServiceId());
-        intent.putExtra("serviceName", service.getName());
-        intent.putExtra("serviceCategory", service.getCategory());
-        intent.putExtra("price", service.getPrice());
-        intent.putExtra("currency", service.getCurrency());
-        intent.putExtra("description", service.getDescription());
-        intent.putExtra("durationMinutes", service.getDurationMinutes());
-        
-        // Convert image URLs to array
-        if (service.getImageUrls() != null) {
-            String[] imageUrls = service.getImageUrls().toArray(new String[0]);
-            intent.putExtra("imageUrls", imageUrls);
-        }
-        
-        startActivity(intent);
-    }
+    // View-only; no Book Now handler anymore
 }
 
 

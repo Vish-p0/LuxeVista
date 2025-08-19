@@ -42,8 +42,8 @@ import java.util.Locale;
 
 public class BookingFlowFragment extends Fragment {
 
-    private TextView tvCheckIn, tvCheckOut;
-    private Button btnSelectDates, btnConfirm;
+    private TextView tvCheckIn, tvCheckOut, tvServiceDate;
+    private Button btnSelectDates, btnConfirm, btnSelectServiceDate;
     private RecyclerView recyclerRooms, recyclerServices;
     private LinearLayout selectedItemsSection, selectedRoomsContainer, selectedServicesContainer;
     private LinearLayout selectedRoomsList, selectedServicesList;
@@ -57,6 +57,7 @@ public class BookingFlowFragment extends Fragment {
 
     private Date checkInDate;
     private Date checkOutDate;
+    private Date selectedServiceDate; // optional pre-selection used in service dialog default
 
     private final SimpleDateFormat apiDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
@@ -105,6 +106,9 @@ public class BookingFlowFragment extends Fragment {
             // Update date display
             tvCheckIn.setText("Check-in: " + DateFormat.format("MMM d, yyyy 2:00 PM", checkInDate));
             tvCheckOut.setText("Check-out: " + DateFormat.format("MMM d, yyyy 11:00 AM", checkOutDate));
+            if (tvServiceDate != null) {
+                tvServiceDate.setText("Service date: Not selected");
+            }
             
             // Use post to ensure view is fully initialized before toggling placeholders
             getView().post(() -> {
@@ -148,6 +152,9 @@ public class BookingFlowFragment extends Fragment {
         btnConfirm = view.findViewById(R.id.btnConfirm);
         recyclerRooms = view.findViewById(R.id.recyclerRooms);
         recyclerServices = view.findViewById(R.id.recyclerServices);
+    // Service date selector
+    tvServiceDate = view.findViewById(R.id.tvSelectedServiceDate);
+    btnSelectServiceDate = view.findViewById(R.id.btnSelectServiceDate);
         
         // Selected items section
         selectedItemsSection = view.findViewById(R.id.selectedItemsSection);
@@ -159,11 +166,13 @@ public class BookingFlowFragment extends Fragment {
 
         // Back button
         ImageButton btnBack = view.findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> {
-            // Navigate back to home
-            androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
-            nav.navigateUp();
-        });
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> {
+                // Navigate back to home
+                androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
+                nav.navigateUp();
+            });
+        }
     }
 
     private void setupRecyclerViews() {
@@ -199,6 +208,9 @@ public class BookingFlowFragment extends Fragment {
     private void setupClickListeners() {
         btnSelectDates.setOnClickListener(v -> openDateRangePicker());
         btnConfirm.setOnClickListener(v -> goToConfirmation());
+        if (btnSelectServiceDate != null) {
+            btnSelectServiceDate.setOnClickListener(v -> openServiceDatePicker());
+        }
     }
 
     private void openDateRangePicker() {
@@ -267,7 +279,7 @@ public class BookingFlowFragment extends Fragment {
         servicesAdapter.setNightsKeys(nights);
         togglePlaceholders(false);
 
-        db.collection("rooms").whereEqualTo("visible", true).get().addOnSuccessListener(snap -> {
+    db.collection("rooms").whereEqualTo("visible", true).get().addOnSuccessListener(snap -> {
             List<Room> list = new ArrayList<>();
             for (DocumentSnapshot doc : snap.getDocuments()) {
                 Room r = doc.toObject(Room.class);
@@ -285,13 +297,43 @@ public class BookingFlowFragment extends Fragment {
             for (DocumentSnapshot doc : snap.getDocuments()) {
                 Service s = doc.toObject(Service.class);
                 if (s == null) continue;
-                boolean ok = true;
-                for (String d : nights) { if (s.getRemainingForDate(d) <= 0) { ok = false; break; } }
+                boolean ok = false; // at least one day within stay has a free slot
+                for (String d : nights) { if (s.getRemainingForDate(d) > 0) { ok = true; break; } }
                 if (ok) list.add(s);
             }
             Log.d("BookingFlow", "Found " + list.size() + " available services for selected dates");
             servicesAdapter.setServices(list);
         });
+    }
+
+    private void openServiceDatePicker() {
+        List<String> nights = getNightsInclusive();
+        if (nights.isEmpty()) {
+            Snackbar.make(requireView(), "Select stay dates first", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        // Build a dialog with formatted nights for selection
+        java.text.SimpleDateFormat pretty = new java.text.SimpleDateFormat("EEE, MMM d", Locale.US);
+        List<String> labels = new ArrayList<>();
+        List<Date> dates = new ArrayList<>();
+        Calendar c = Calendar.getInstance();
+        c.setTime(checkInDate);
+        while (c.getTime().before(checkOutDate)) {
+            Date d = c.getTime();
+            labels.add(pretty.format(d));
+            dates.add(d);
+            c.add(Calendar.DATE, 1);
+        }
+        String[] arr = labels.toArray(new String[0]);
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("Select service date")
+                .setItems(arr, (dialog, which) -> {
+                    selectedServiceDate = dates.get(which);
+                    if (tvServiceDate != null) {
+                        tvServiceDate.setText("Service date: " + DateFormat.format("MMM d, yyyy", selectedServiceDate));
+                    }
+                })
+                .show();
     }
 
     private void togglePlaceholders(boolean showPlaceholders) {
@@ -387,7 +429,7 @@ public class BookingFlowFragment extends Fragment {
         d.show();
     }
 
-    private void showServiceDetailsDialog(Service service, int maxQty) {
+    private void showServiceDetailsDialog(Service service, int unusedMaxQty) {
         android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(getContext());
         View content = LayoutInflater.from(getContext()).inflate(R.layout.dialog_service_details, null, false);
         
@@ -410,43 +452,93 @@ public class BookingFlowFragment extends Fragment {
         tvDuration.setText(service.getFormattedDuration());
         tvPrice.setText(String.format(Locale.US, "$%.2f", service.getPrice()));
         
-        // Setup quantity and time spinners
-        Spinner spnQty = content.findViewById(R.id.spnQuantity);
+        // Setup date, time, and quantity spinners
+        Spinner spnDate = content.findViewById(R.id.spnDate);
         Spinner spnTime = content.findViewById(R.id.spnTimeSlot);
-        
-        List<Integer> qtyOptions = new ArrayList<>();
-        for (int i = 1; i <= Math.max(0, maxQty); i++) qtyOptions.add(i);
-        if (qtyOptions.isEmpty()) qtyOptions.add(0);
-        spnQty.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, qtyOptions));
-        
-        // Get available time slots for the selected date
-        List<String> availableTimeSlots = new ArrayList<>();
-        if (checkInDate != null) {
-            String dateKey = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(checkInDate);
-            availableTimeSlots = service.getAvailableTimesForDate(dateKey);
+        Spinner spnQty = content.findViewById(R.id.spnQuantity);
+
+        // Build date options from stay dates
+        List<String> nightKeys = getNightsInclusive();
+        List<Date> nightDates = new ArrayList<>();
+        List<String> dateLabels = new ArrayList<>();
+        SimpleDateFormat api = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat pretty = new SimpleDateFormat("EEE, MMM d", Locale.US);
+        Calendar c = Calendar.getInstance();
+        c.setTime(checkInDate != null ? checkInDate : new Date());
+        while (checkInDate != null && c.getTime().before(checkOutDate)) {
+            Date d = c.getTime();
+            nightDates.add(d);
+            dateLabels.add(pretty.format(d));
+            c.add(Calendar.DATE, 1);
         }
-        
-        // If no specific time slots available, use default hours
-        if (availableTimeSlots.isEmpty()) {
-            for (int h = 9; h <= 20; h++) {
-                availableTimeSlots.add(String.format(Locale.US, "%02d:00", h));
+        if (nightDates.isEmpty() && checkInDate != null && checkOutDate != null) {
+            // Fallback just in case; should not happen due to earlier checks
+            nightDates.add(checkInDate);
+            dateLabels.add(pretty.format(checkInDate));
+        }
+        ArrayAdapter<String> dateAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, dateLabels);
+        spnDate.setAdapter(dateAdapter);
+        // Preselect the service date if chosen previously
+        int preSel = 0;
+        if (selectedServiceDate != null) {
+            for (int i = 0; i < nightDates.size(); i++) {
+                if (api.format(nightDates.get(i)).equals(api.format(selectedServiceDate))) { preSel = i; break; }
             }
         }
-        
-        spnTime.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, availableTimeSlots));
+        if (!nightDates.isEmpty()) spnDate.setSelection(preSel);
+
+        // Helper to refresh times and quantity based on selected date and time
+        final Runnable[] refreshQty = new Runnable[1];
+        Runnable refreshTimes = () -> {
+            int idx = spnDate.getSelectedItemPosition();
+            if (idx < 0 || idx >= nightDates.size()) return;
+            String dateKey = api.format(nightDates.get(idx));
+            List<String> times = service.getAvailableTimesForDate(dateKey);
+            spnTime.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, times));
+            // Trigger qty refresh
+            if (refreshQty[0] != null) refreshQty[0].run();
+        };
+        refreshQty[0] = () -> {
+            int idx = spnDate.getSelectedItemPosition();
+            if (idx < 0 || idx >= nightDates.size()) return;
+            String dateKey = api.format(nightDates.get(idx));
+            String time = spnTime.getSelectedItem() != null ? spnTime.getSelectedItem().toString() : null;
+            List<Integer> qtyOptions = new ArrayList<>();
+            int remaining = 0;
+            if (time != null) {
+                remaining = service.getAvailableSlotsForDateAndTime(dateKey, time);
+            }
+            for (int i = 1; i <= Math.max(0, remaining); i++) qtyOptions.add(i);
+            if (qtyOptions.isEmpty()) qtyOptions.add(0);
+            spnQty.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, qtyOptions));
+        };
+
+        spnDate.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view1, int position, long id) { refreshTimes.run(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+        spnTime.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view12, int position, long id) { if (refreshQty[0] != null) refreshQty[0].run(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+
+        // Initialize controls
+        refreshTimes.run();
         
         // Setup apply button
         content.findViewById(R.id.btnApply).setOnClickListener(v -> {
-            int qty = (Integer) spnQty.getSelectedItem();
+            Integer qty = (Integer) spnQty.getSelectedItem();
             String time = (String) spnTime.getSelectedItem();
-            if (qty > 0 && checkInDate != null) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(checkInDate);
+            int dateIdx = spnDate.getSelectedItemPosition();
+            if (qty != null && qty > 0 && dateIdx >= 0 && dateIdx < nightDates.size() && time != null) {
+                Calendar cSel = Calendar.getInstance();
+                cSel.setTime(nightDates.get(dateIdx));
                 String[] hh = time.split(":");
-                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hh[0]));
-                c.set(Calendar.MINUTE, 0);
+                cSel.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hh[0]));
+                cSel.set(Calendar.MINUTE, 0);
+                cSel.set(Calendar.SECOND, 0);
                 BookingCart.getInstance().serviceSelections.add(new BookingCart.ServiceSelection(
-                        service.getServiceId(), service.getName(), service.getPrice(), qty, new Timestamp(c.getTime())
+                        service.getServiceId(), service.getName(), service.getPrice(), qty, new Timestamp(cSel.getTime())
                 ));
                 
                 // Update the adapter to show the selected service
@@ -660,9 +752,9 @@ public class BookingFlowFragment extends Fragment {
         cart.checkIn = new Timestamp(checkInDate);
         cart.checkOut = new Timestamp(checkOutDate);
         
-        // Check if we have any selections
-        if (cart.roomSelections.isEmpty() && cart.serviceSelections.isEmpty()) {
-            Snackbar.make(requireView(), "Please select at least one room or service", Snackbar.LENGTH_LONG).show();
+        // Require at least one room before proceeding
+        if (cart.roomSelections.isEmpty()) {
+            Snackbar.make(requireView(), "Please select at least one room", Snackbar.LENGTH_LONG).show();
             return;
         }
         

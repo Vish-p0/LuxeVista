@@ -209,38 +209,40 @@ public class Service {
 
     @Exclude
     public int getAvailableSlotsForDateAndTime(String dateKey, String timeKey) {
+        int total = 0;
+        if (timeSlots != null && timeSlots.containsKey(timeKey)) {
+            total = timeSlots.get(timeKey);
+        }
+
+        int booked = 0;
         if (availability != null && availability.containsKey(dateKey)) {
             Map<String, Integer> dateAvailability = availability.get(dateKey);
             if (dateAvailability != null && dateAvailability.containsKey(timeKey)) {
-                return dateAvailability.get(timeKey);
+                Integer b = dateAvailability.get(timeKey);
+                booked = b != null ? b : 0;
             }
         }
-        
-        // Fallback to legacy availability or default
-        if (timeSlots != null && timeSlots.containsKey(timeKey)) {
-            return timeSlots.get(timeKey);
-        }
-        
-        return 0;
+
+        int remaining = total - booked;
+        return Math.max(0, remaining);
     }
 
     @Exclude
     public boolean hasAvailableSlotsForDate(String dateKey) {
-        if (availability != null && availability.containsKey(dateKey)) {
-            Map<String, Integer> dateAvailability = availability.get(dateKey);
-            if (dateAvailability != null) {
-                for (Integer slots : dateAvailability.values()) {
-                    if (slots > 0) return true;
-                }
+        // Check remaining capacity across defined time slots
+        if (timeSlots != null && !timeSlots.isEmpty()) {
+            for (Map.Entry<String, Integer> entry : timeSlots.entrySet()) {
+                String time = entry.getKey();
+                int remaining = getAvailableSlotsForDateAndTime(dateKey, time);
+                if (remaining > 0) return true;
             }
         }
-        
-        // Fallback to legacy availability
-        if (legacyAvailability != null && legacyAvailability.containsKey(dateKey)) {
-            long booked = legacyAvailability.get(dateKey);
-            return booked < defaultDailySlots;
+
+        // Fallback to legacy availability (per-day capacity)
+        if (legacyAvailability != null) {
+            long booked = legacyAvailability.getOrDefault(dateKey, 0L);
+            return defaultDailySlots > booked;
         }
-        
         return false;
     }
 
@@ -278,24 +280,21 @@ public class Service {
     // Legacy compatibility method
     @Exclude
     public int getRemainingForDate(String dateKey) {
-        // Try new availability system first
-        if (hasAvailableSlotsForDate(dateKey)) {
-            List<String> availableTimes = getAvailableTimesForDate(dateKey);
-            int totalAvailable = 0;
-            for (String time : availableTimes) {
-                totalAvailable += getAvailableSlotsForDateAndTime(dateKey, time);
+        // Sum remaining across all defined time slots
+        int totalRemaining = 0;
+        if (timeSlots != null) {
+            for (Map.Entry<String, Integer> entry : timeSlots.entrySet()) {
+                String time = entry.getKey();
+                totalRemaining += getAvailableSlotsForDateAndTime(dateKey, time);
             }
-            return totalAvailable;
         }
-        
-        // Fallback to legacy system
-        int dailyCapacity = defaultDailySlots;
-        if (dailyCapacity <= 0) return 0;
-        long booked = 0L;
-        if (legacyAvailability != null && legacyAvailability.containsKey(dateKey) && legacyAvailability.get(dateKey) != null) {
-            booked = legacyAvailability.get(dateKey);
+
+        // If no timeSlots configured, fallback to legacy per-day capacity
+        if (totalRemaining == 0 && legacyAvailability != null) {
+            int dailyCapacity = defaultDailySlots;
+            long booked = legacyAvailability.getOrDefault(dateKey, 0L);
+            return Math.max(0, dailyCapacity - (int) booked);
         }
-        long remaining = (long) dailyCapacity - booked;
-        return (int) Math.max(0L, remaining);
+        return totalRemaining;
     }
 }

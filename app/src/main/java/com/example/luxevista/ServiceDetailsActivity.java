@@ -87,8 +87,11 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         loadDataFromIntent();
         setupToolbar();
         setupImageCarousel();
-        setupDateTimeSelection();
-        setupBookingButton();
+    // View-only: hide booking interactions
+    if (cardDateTime != null) cardDateTime.setVisibility(View.GONE);
+    if (bookingSummaryLayout != null) bookingSummaryLayout.setVisibility(View.GONE);
+    if (btnBookNow != null) btnBookNow.setVisibility(View.GONE);
+    // Do not set up date/time pickers or booking button
         displayServiceInfo();
         setupBottomNavigation();
     }
