@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -319,13 +320,14 @@ public class BookingDetailsFragment extends Fragment {
         if (booking == null) return;
         
         // Update booking status to cancelled
-        db.collection("bookings")
+    db.collection("bookings")
                 .document(bookingId)
                 .update("status", "cancelled")
                 .addOnSuccessListener(aVoid -> {
-                    Snackbar.make(requireView(), "Booking cancelled successfully", Snackbar.LENGTH_LONG).show();
-                    // Refresh the display
-                    loadBookingDetails();
+            // Notify and navigate back to Bookings list
+            Toast.makeText(requireContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
+            androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
+            nav.popBackStack();
                 })
                 .addOnFailureListener(e -> {
                     Snackbar.make(requireView(), "Failed to cancel booking: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
