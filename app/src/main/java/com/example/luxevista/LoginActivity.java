@@ -11,6 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,6 +35,12 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin = findViewById(R.id.buttonLogin);
         textViewRegister = findViewById(R.id.textViewRegister);
         textViewForgotPassword = findViewById(R.id.textViewForgotPassword);
+
+        // Prefill email if coming from signup redirect
+        String prefillEmail = getIntent().getStringExtra("prefillEmail");
+        if (prefillEmail != null && !prefillEmail.isEmpty()) {
+            editTextEmail.setText(prefillEmail);
+        }
 
         buttonLogin.setOnClickListener(v -> loginUser());
 
@@ -70,7 +79,27 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 } else {
-                    Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    Exception ex = task.getException();
+                    boolean showGenericCredsMsg = false;
+                    if (ex instanceof FirebaseAuthInvalidCredentialsException || ex instanceof FirebaseAuthInvalidUserException) {
+                        showGenericCredsMsg = true;
+                    } else if (ex instanceof FirebaseAuthException) {
+                        String code = ((FirebaseAuthException) ex).getErrorCode();
+                        if ("ERROR_WRONG_PASSWORD".equals(code) || "ERROR_USER_NOT_FOUND".equals(code) || "ERROR_INVALID_EMAIL".equals(code)) {
+                            showGenericCredsMsg = true;
+                        }
+                    }
+
+                    if (showGenericCredsMsg) {
+                        String msg = "Your email or password is incorrect";
+                        Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_LONG).show();
+                        editTextPassword.setError(msg);
+                        // Also hint on email field without showing error icon persistently
+                        editTextEmail.requestFocus();
+                    } else {
+                        String fallback = ex != null && ex.getMessage() != null ? ex.getMessage() : "Login failed. Please try again.";
+                        Toast.makeText(LoginActivity.this, fallback, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
     }

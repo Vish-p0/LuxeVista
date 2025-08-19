@@ -97,6 +97,19 @@ public class SettingsFragment extends Fragment {
         cardTerms = view.findViewById(R.id.cardTerms);
         cardPrivacy = view.findViewById(R.id.cardPrivacy);
         cardSupport = view.findViewById(R.id.cardSupport);
+
+        // Back button to Profile
+        View btnBackToProfile = view.findViewById(R.id.btnBackToProfile);
+        if (btnBackToProfile != null) {
+            btnBackToProfile.setOnClickListener(v -> {
+                try {
+                    androidx.navigation.NavController nav = androidx.navigation.Navigation.findNavController(requireView());
+                    nav.navigateUp();
+                } catch (Exception ignored) {
+                    requireActivity().onBackPressed();
+                }
+            });
+        }
     }
 
     private void setupLanguageSpinner() {

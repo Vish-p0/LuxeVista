@@ -140,12 +140,31 @@ public class ProfileFragment extends Fragment {
         String name = snapshot.getString("name");
         String email = snapshot.getString("email");
         String phone = snapshot.getString("phone");
-        Timestamp birthDay = snapshot.getTimestamp("birthDay");
+    Timestamp birthDay = snapshot.getTimestamp("birthDay");
+    String birthdayIso = snapshot.getString("birthday");
 
         tvUserName.setText(name != null ? name : "");
         tvUserEmail.setText(email != null ? email : "");
         tvUserPhone.setText(phone != null ? phone : "");
-        String birthdayText = formatDate(birthDay != null ? birthDay.toDate() : null);
+        String birthdayText = "";
+        if (birthDay != null) {
+            birthdayText = formatDate(birthDay.toDate());
+        } else if (birthdayIso != null && !birthdayIso.isEmpty()) {
+            try {
+                // try multiple formats
+                java.util.Date parsed;
+                try {
+                    parsed = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).parse(birthdayIso);
+                } catch (Exception e1) {
+                    try {
+                        parsed = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).parse(birthdayIso);
+                    } catch (Exception e2) {
+                        parsed = null;
+                    }
+                }
+                if (parsed != null) birthdayText = formatDate(parsed);
+            } catch (Exception ignored) {}
+        }
         tvUserBirthday.setText(!birthdayText.isEmpty() ? birthdayText : getString(R.string.not_set));
     }
 

@@ -91,6 +91,10 @@ public class SignupStep2Fragment extends Fragment {
             birthdayCal.set(year, month, dayOfMonth);
             etBirthday.setText(dateFormat.format(birthdayCal.getTime()));
         }, birthdayCal.get(Calendar.YEAR), birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DAY_OF_MONTH));
+    // Require users to be at least 12 years old: prevent selecting dates after (today - 12 years)
+    Calendar maxBirthCal = Calendar.getInstance();
+    maxBirthCal.add(Calendar.YEAR, -12);
+    dialog.getDatePicker().setMaxDate(maxBirthCal.getTimeInMillis());
         dialog.show();
     }
 
@@ -103,9 +107,11 @@ public class SignupStep2Fragment extends Fragment {
         String email = listener.getEmail();
         String password = listener.getPassword();
 
-        String name = etFullName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String birthdayIso = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'", Locale.getDefault()).format(birthdayCal.getTime());
+    String name = etFullName.getText() == null ? "" : etFullName.getText().toString().trim();
+    String phoneRaw = etPhone.getText() == null ? "" : etPhone.getText().toString();
+    String phone = phoneRaw.replaceAll("\\D", "");
+    String birthdayIso = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'", Locale.getDefault()).format(birthdayCal.getTime());
+    Timestamp birthDayTs = new Timestamp(birthdayCal.getTime());
         String roomType = getSelectedRoomType();
         boolean noSmoking = switchNoSmoking.isChecked();
 
@@ -128,6 +134,7 @@ public class SignupStep2Fragment extends Fragment {
                     profile.put("email", email);
                     profile.put("phone", phone);
                     profile.put("birthday", birthdayIso);
+                    profile.put("birthDay", birthDayTs);
                     Map<String, Object> prefs = new HashMap<>();
                     prefs.put("roomType", roomType);
                     prefs.put("noSmoking", noSmoking);
@@ -214,17 +221,32 @@ public class SignupStep2Fragment extends Fragment {
         tilBirthday.setError(null);
 
         boolean ok = true;
-        if (TextUtils.isEmpty(etFullName.getText())) {
-            tilFullName.setError("Name required");
+        String name = etFullName.getText() == null ? "" : etFullName.getText().toString().trim();
+        String phoneRaw = etPhone.getText() == null ? "" : etPhone.getText().toString();
+        String phoneDigits = phoneRaw.replaceAll("\\D", "");
+        String birthdayText = etBirthday.getText() == null ? "" : etBirthday.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            tilFullName.setError("Enter your full name");
             ok = false;
         }
-        if (TextUtils.isEmpty(etPhone.getText())) {
-            tilPhone.setError("Phone required");
+        if (phoneDigits.length() != 10) {
+            tilPhone.setError("Phone must be exactly 10 digits");
             ok = false;
         }
-        if (TextUtils.isEmpty(etBirthday.getText())) {
+        if (TextUtils.isEmpty(birthdayText)) {
             tilBirthday.setError("Birthday required");
             ok = false;
+        } else {
+            Calendar minAllowed = Calendar.getInstance();
+            minAllowed.add(Calendar.YEAR, -12);
+            if (birthdayCal.after(minAllowed)) {
+                tilBirthday.setError("You must be at least 12 years old");
+                ok = false;
+            }
+        }
+        if (!phoneRaw.equals(phoneDigits)) {
+            etPhone.setText(phoneDigits);
         }
         return ok;
     }

@@ -18,8 +18,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DURATION = 3000; // 3 seconds
-    private static final int WELCOME_TEXT_DELAY = 1000; // 1 second
+    private static final int SPLASH_DURATION = 4500; // slower splash: 4.5 seconds
+    private static final int WELCOME_TEXT_DELAY = 1200; // slightly slower reveal
     
     private LottieAnimationView lottieAnimation;
     private TextView tvWelcomeText;
@@ -68,11 +68,11 @@ public class SplashActivity extends AppCompatActivity {
     }
     
     private void startAnimations() {
-        // Lottie animation fade in
+        // Lottie animation fade in (slower)
         lottieAnimation.animate()
             .alpha(1f)
-            .setDuration(600)
-            .setStartDelay(500)
+            .setDuration(900)
+            .setStartDelay(600)
             .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -83,21 +83,21 @@ public class SplashActivity extends AppCompatActivity {
             })
             .start();
         
-        // Welcome text animation
+    // Welcome text animation (slower)
         welcomeTextRunnable = () -> {
             tvWelcomeText.animate()
                 .alpha(1f)
                 .translationY(0f)
-                .setDuration(600)
+        .setDuration(900)
                 .start();
         };
         mainHandler.postDelayed(welcomeTextRunnable, WELCOME_TEXT_DELAY);
         
-        // Version text animation
+    // Version text animation (slower)
         versionTextRunnable = () -> {
             tvVersion.animate()
                 .alpha(1f)
-                .setDuration(400)
+        .setDuration(700)
                 .start();
         };
         mainHandler.postDelayed(versionTextRunnable, WELCOME_TEXT_DELAY + 300);
@@ -108,7 +108,7 @@ public class SplashActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar.animate()
                     .alpha(1f)
-                    .setDuration(300)
+            .setDuration(600)
                     .start();
             }
         };
